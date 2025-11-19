@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Strateginio mąstymo testas (STQ)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strateginio Mąstymo Testas</title>
+style.css
 </head>
 <body>
-  <div class="container">
-    <h1>Strateginio mąstymo testas</h1>
-    <p>Įvertinkite kiekvieną teiginį pagal tai, kiek jis jums tinka.</p>
-    <div id="quiz-container"></div>
-    <button onclick="submitQuiz()">Pateikti atsakymus</button>
-    <div id="result"></div>
-    <button id="printBtn" style="display:none;" onclick="window.print()">Atsispausdinti PDF</button>
-  </div>
-  <script src="script.js"></script>
+<div class="container">
+    <h1>Strateginio Mąstymo Testas</h1>
+    <div id="quiz-container">
+        <div id="progress"></div>
+        <div id="question"></div>
+        <div id="answers"></div>
+        <button id="next-btn">Kitas</button>
+    </div>
+    <div id="result" class="hidden">
+        <h2>Jūsų rezultatai</h2>
+        <div id="summary"></div>
+        <button id="download-pdf">Atsisiųsti PDF</button>
+    </div>
+</div>
+script.js</script>
+<script srcdf.bundle.min.js</script>
 </body>
 </html>
