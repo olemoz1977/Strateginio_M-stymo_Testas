@@ -1,15 +1,27 @@
 const questions = [
-  { text: "Aš dažnai apmąstau savo sprendimus.", reverse: false },
-  { text: "Aš retai galvoju apie savo sprendimų pasekmes.", reverse: true },
-  { text: "Gebu įžvelgti ryšius tarp skirtingų situacijų.", reverse: false },
-  { text: "Man sunku matyti bendrą vaizdą, kai sprendžiu problemas.", reverse: true },
-  { text: "Aš dažnai permąstau situacijas iš skirtingų perspektyvų.", reverse: false },
-  { text: "Mano sprendimai dažniausiai būna impulsyvūs.", reverse: true },
-  { text: "Aš planuoju savo veiksmus atsižvelgdamas į ilgalaikes pasekmes.", reverse: false },
-  { text: "Man nesvarbu, kaip mano sprendimai paveiks kitus.", reverse: true }
+  // Refleksija
+  { text: "Aš dažnai apmąstau savo sprendimus.", reverse: false, dimension: "Refleksija" },
+  { text: "Man nesvarbu, kokias pasekmes turi mano sprendimai.", reverse: true, dimension: "Refleksija" },
+  { text: "Aš mokausi iš savo klaidų.", reverse: false, dimension: "Refleksija" },
+  { text: "Aš retai analizuoju, kodėl mano sprendimai buvo sėkmingi ar nesėkmingi.", reverse: true, dimension: "Refleksija" },
+  { text: "Aš reguliariai reflektuoju savo veiklą.", reverse: false, dimension: "Refleksija" },
+
+  // Reframing
+  { text: "Aš dažnai permąstau situacijas iš skirtingų perspektyvų.", reverse: false, dimension: "Reframing" },
+  { text: "Man sunku įsivaizduoti alternatyvius požiūrius į problemą.", reverse: true, dimension: "Reframing" },
+  { text: "Aš gebu keisti savo požiūrį, kai gaunu naujos informacijos.", reverse: false, dimension: "Reframing" },
+  { text: "Aš laikausi vienos nuomonės, net jei aplinkybės keičiasi.", reverse: true, dimension: "Reframing" },
+  { text: "Aš vertinu skirtingus požiūrius prieš priimdamas sprendimą.", reverse: false, dimension: "Reframing" },
+
+  // Sisteminis mąstymas
+  { text: "Gebu įžvelgti ryšius tarp skirtingų situacijų.", reverse: false, dimension: "Sisteminis" },
+  { text: "Man sunku matyti bendrą vaizdą, kai sprendžiu problemas.", reverse: true, dimension: "Sisteminis" },
+  { text: "Aš planuoju savo veiksmus atsižvelgdamas į ilgalaikes pasekmes.", reverse: false, dimension: "Sisteminis" },
+  { text: "Man nesvarbu, kaip mano sprendimai paveiks kitus.", reverse: true, dimension: "Sisteminis" },
+  { text: "Aš suprantu, kaip mano sprendimai veikia visą organizaciją ar komandą.", reverse: false, dimension: "Sisteminis" }
 ];
 
-// Atsitiktinis klausimų sumaišymas
+// Atsitiktinis sumaišymas
 const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
 
 const likertOptions = [
