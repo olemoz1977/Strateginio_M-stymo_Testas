@@ -1,27 +1,26 @@
 const questions = [
   // Refleksija
-  { text: "Aš dažnai apmąstau savo sprendimus.", reverse: false, dimension: "Refleksija" },
-  { text: "Man nesvarbu, kokias pasekmes turi mano sprendimai.", reverse: true, dimension: "Refleksija" },
-  { text: "Aš mokausi iš savo klaidų.", reverse: false, dimension: "Refleksija" },
-  { text: "Aš retai analizuoju, kodėl mano sprendimai buvo sėkmingi ar nesėkmingi.", reverse: true, dimension: "Refleksija" },
-  { text: "Aš reguliariai reflektuoju savo veiklą.", reverse: false, dimension: "Refleksija" },
+  { text: "Aš dažnai apmąstau savo sprendimus.", reverse: false },
+  { text: "Man nesvarbu, kokias pasekmes turi mano sprendimai.", reverse: true },
+  { text: "Aš mokausi iš savo klaidų.", reverse: false },
+  { text: "Aš retai analizuoju, kodėl mano sprendimai buvo sėkmingi ar nesėkmingi.", reverse: true },
+  { text: "Aš reguliariai reflektuoju savo veiklą.", reverse: false },
 
   // Reframing
-  { text: "Aš dažnai permąstau situacijas iš skirtingų perspektyvų.", reverse: false, dimension: "Reframing" },
-  { text: "Man sunku įsivaizduoti alternatyvius požiūrius į problemą.", reverse: true, dimension: "Reframing" },
-  { text: "Aš gebu keisti savo požiūrį, kai gaunu naujos informacijos.", reverse: false, dimension: "Reframing" },
-  { text: "Aš laikausi vienos nuomonės, net jei aplinkybės keičiasi.", reverse: true, dimension: "Reframing" },
-  { text: "Aš vertinu skirtingus požiūrius prieš priimdamas sprendimą.", reverse: false, dimension: "Reframing" },
+  { text: "Aš dažnai permąstau situacijas iš skirtingų perspektyvų.", reverse: false },
+  { text: "Man sunku įsivaizduoti alternatyvius požiūrius į problemą.", reverse: true },
+  { text: "Aš gebu keisti savo požiūrį, kai gaunu naujos informacijos.", reverse: false },
+  { text: "Aš laikausi vienos nuomonės, net jei aplinkybės keičiasi.", reverse: true },
+  { text: "Aš vertinu skirtingus požiūrius prieš priimdamas sprendimą.", reverse: false },
 
   // Sisteminis mąstymas
-  { text: "Gebu įžvelgti ryšius tarp skirtingų situacijų.", reverse: false, dimension: "Sisteminis" },
-  { text: "Man sunku matyti bendrą vaizdą, kai sprendžiu problemas.", reverse: true, dimension: "Sisteminis" },
-  { text: "Aš planuoju savo veiksmus atsižvelgdamas į ilgalaikes pasekmes.", reverse: false, dimension: "Sisteminis" },
-  { text: "Man nesvarbu, kaip mano sprendimai paveiks kitus.", reverse: true, dimension: "Sisteminis" },
-  { text: "Aš suprantu, kaip mano sprendimai veikia visą organizaciją ar komandą.", reverse: false, dimension: "Sisteminis" }
+  { text: "Gebu įžvelgti ryšius tarp skirtingų situacijų.", reverse: false },
+  { text: "Man sunku matyti bendrą vaizdą, kai sprendžiu problemas.", reverse: true },
+  { text: "Aš planuoju savo veiksmus atsižvelgdamas į ilgalaikes pasekmes.", reverse: false },
+  { text: "Man nesvarbu, kaip mano sprendimai paveiks kitus.", reverse: true },
+  { text: "Aš suprantu, kaip mano sprendimai veikia visą organizaciją ar komandą.", reverse: false }
 ];
 
-// Atsitiktinis sumaišymas
 const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
 
 const likertOptions = [
@@ -39,7 +38,7 @@ function loadQuiz() {
     div.className = "question";
     div.innerHTML = `<p>${i + 1}. ${q.text}</p>` +
       likertOptions.map((opt, j) =>
-        `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label><br>`
+        `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`
       ).join("");
     container.appendChild(div);
   });
@@ -65,12 +64,16 @@ function submitQuiz() {
   let message = "";
   if (answered < shuffledQuestions.length) {
     message = "Prašome atsakyti į visus klausimus.";
+    document.getElementById("printBtn").style.display = "none";
   } else if (percentage >= 75) {
     message = "Jūsų strateginio mąstymo lygis yra aukštas.";
+    document.getElementById("printBtn").style.display = "inline-block";
   } else if (percentage >= 50) {
     message = "Jūsų strateginio mąstymo lygis yra vidutinis.";
+    document.getElementById("printBtn").style.display = "inline-block";
   } else {
     message = "Rekomenduojama toliau lavinti strateginio mąstymo įgūdžius.";
+    document.getElementById("printBtn").style.display = "inline-block";
   }
 
   document.getElementById("result").innerText = `Rezultatas: ${percentage}% – ${message}`;
