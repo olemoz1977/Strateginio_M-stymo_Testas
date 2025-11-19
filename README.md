@@ -7,6 +7,8 @@ Interaktyvus testas, skirtas įvertinti strateginio mąstymo gebėjimus pagal 3 
 
 Testas pritaikytas mobiliesiems įrenginiams, turi tamsią temą ir galimybę atsisiųsti rezultatus PDF formatu.
 
+pradek testa https://olemoz1977.github.io/Strateginio_M-stymo_Testas/
+
 ---
 
 ## 🔍 Funkcijos
