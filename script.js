@@ -1,23 +1,32 @@
 const questions = [
-  {
-    question: "Kuris iš šių veiksmų geriausiai atspindi strateginį mąstymą?",
-    options: ["Greitas sprendimas", "Ilgalaikė vizija", "Emocinis atsakas", "Atsitiktinis pasirinkimas"],
-    answer: 1
-  },
-  {
-    question: "Ką reiškia SWOT analizė?",
-    options: ["Stiprybės, silpnybės, galimybės, grėsmės", "Strategijos, veiklos, organizacijos, technologijos", "Sistemos, veiklos, orientacijos, tikslai", "Sąmoningumas, veiksmingumas, organizuotumas, tikslumas"],
-    answer: 0
-  }
+  { text: "Aš dažnai apmąstau savo sprendimus.", reverse: false },
+  { text: "Aš retai galvoju apie savo sprendimų pasekmes.", reverse: true },
+  { text: "Gebu įžvelgti ryšius tarp skirtingų situacijų.", reverse: false },
+  { text: "Man sunku matyti bendrą vaizdą, kai sprendžiu problemas.", reverse: true },
+  { text: "Aš dažnai permąstau situacijas iš skirtingų perspektyvų.", reverse: false },
+  { text: "Mano sprendimai dažniausiai būna impulsyvūs.", reverse: true },
+  { text: "Aš planuoju savo veiksmus atsižvelgdamas į ilgalaikes pasekmes.", reverse: false },
+  { text: "Man nesvarbu, kaip mano sprendimai paveiks kitus.", reverse: true }
+];
+
+// Atsitiktinis klausimų sumaišymas
+const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+
+const likertOptions = [
+  "Visiškai nesutinku",
+  "Nesutinku",
+  "Nei sutinku, nei nesutinku",
+  "Sutinku",
+  "Visiškai sutinku"
 ];
 
 function loadQuiz() {
   const container = document.getElementById("quiz-container");
-  questions.forEach((q, i) => {
+  shuffledQuestions.forEach((q, i) => {
     const div = document.createElement("div");
     div.className = "question";
-    div.innerHTML = `<p>${q.question}</p>` +
-      q.options.map((opt, j) =>
+    div.innerHTML = `<p>${i + 1}. ${q.text}</p>` +
+      likertOptions.map((opt, j) =>
         `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label><br>`
       ).join("");
     container.appendChild(div);
@@ -26,11 +35,33 @@ function loadQuiz() {
 
 function submitQuiz() {
   let score = 0;
-  questions.forEach((q, i) => {
+  let answered = 0;
+
+  shuffledQuestions.forEach((q, i) => {
     const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    if (selected && parseInt(selected.value) === q.answer) score++;
+    if (selected) {
+      let val = parseInt(selected.value);
+      if (q.reverse) val = 4 - val;
+      score += val;
+      answered++;
+    }
   });
-  document.getElementById("result").innerText = `Rezultatas: ${score} iš ${questions.length}`;
+
+  const maxScore = shuffledQuestions.length * 4;
+  const percentage = Math.round((score / maxScore) * 100);
+
+  let message = "";
+  if (answered < shuffledQuestions.length) {
+    message = "Prašome atsakyti į visus klausimus.";
+  } else if (percentage >= 75) {
+    message = "Jūsų strateginio mąstymo lygis yra aukštas.";
+  } else if (percentage >= 50) {
+    message = "Jūsų strateginio mąstymo lygis yra vidutinis.";
+  } else {
+    message = "Rekomenduojama toliau lavinti strateginio mąstymo įgūdžius.";
+  }
+
+  document.getElementById("result").innerText = `Rezultatas: ${percentage}% – ${message}`;
 }
 
 loadQuiz();
