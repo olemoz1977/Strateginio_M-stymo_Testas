@@ -1,82 +1,60 @@
 const questions = [
-  // Refleksija
-  { text: "Aš dažnai apmąstau savo sprendimus.", reverse: false },
-  { text: "Man nesvarbu, kokias pasekmes turi mano sprendimai.", reverse: true },
-  { text: "Aš mokausi iš savo klaidų.", reverse: false },
-  { text: "Aš retai analizuoju, kodėl mano sprendimai buvo sėkmingi ar nesėkmingi.", reverse: true },
-  { text: "Aš reguliariai reflektuoju savo veiklą.", reverse: false },
-
-  // Reframing
-  { text: "Aš dažnai permąstau situacijas iš skirtingų perspektyvų.", reverse: false },
-  { text: "Man sunku įsivaizduoti alternatyvius požiūrius į problemą.", reverse: true },
-  { text: "Aš gebu keisti savo požiūrį, kai gaunu naujos informacijos.", reverse: false },
-  { text: "Aš laikausi vienos nuomonės, net jei aplinkybės keičiasi.", reverse: true },
-  { text: "Aš vertinu skirtingus požiūrius prieš priimdamas sprendimą.", reverse: false },
-
-  // Sisteminis mąstymas
-  { text: "Gebu įžvelgti ryšius tarp skirtingų situacijų.", reverse: false },
-  { text: "Man sunku matyti bendrą vaizdą, kai sprendžiu problemas.", reverse: true },
-  { text: "Aš planuoju savo veiksmus atsižvelgdamas į ilgalaikes pasekmes.", reverse: false },
-  { text: "Man nesvarbu, kaip mano sprendimai paveiks kitus.", reverse: true },
-  { text: "Aš suprantu, kaip mano sprendimai veikia visą organizaciją ar komandą.", reverse: false }
+    { text: "Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...", answers: [
+        { text: "Naudoju formalią matricą...", score: 4, dim: "Sisteminis" },
+        { text: "Ignoruoju kitus skyrius...", score: 1, dim: "Sisteminis" },
+        { text: "Analizuoju visos organizacijos grandinę...", score: 5, dim: "Sisteminis" }
+    ]},
+    // ... Įkelti visus 15 klausimų su atsakymais ir dimensijomis
 ];
 
-const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+let currentQuestion = 0;
+let scores = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
 
-const likertOptions = [
-  "Visiškai nesutinku",
-  "Nesutinku",
-  "Nei sutinku, nei nesutinku",
-  "Sutinku",
-  "Visiškai sutinku"
-];
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const progressEl = document.getElementById('progress');
+const nextBtn = document.getElementById('next-btn');
+const resultEl = document.getElementById('result');
+const summaryEl = document.getElementById('summary');
 
-function loadQuiz() {
-  const container = document.getElementById("quiz-container");
-  shuffledQuestions.forEach((q, i) => {
-    const div = document.createElement("div");
-    div.className = "question";
-    div.innerHTML = `<p>${i + 1}. ${q.text}</p>` +
-      likertOptions.map((opt, j) =>
-        `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`
-      ).join("");
-    container.appendChild(div);
-  });
+function showQuestion() {
+    const q = questions[currentQuestion];
+    questionEl.textContent = q.text;
+    answersEl.innerHTML = '';
+    q.answers.forEach(a => {
+        const btn = document.createElement('button');
+        btn.textContent = a.text;
+        btn.onclick = () => {
+            scores[a.dim] += a.score;
+            nextBtn.disabled = false;
+        };
+        answersEl.appendChild(btn);
+    });
+    progressEl.textContent = `${currentQuestion + 1}/${questions.length}`;
+    nextBtn.disabled = true;
 }
 
-function submitQuiz() {
-  let score = 0;
-  let answered = 0;
-
-  shuffledQuestions.forEach((q, i) => {
-    const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    if (selected) {
-      let val = parseInt(selected.value);
-      if (q.reverse) val = 4 - val;
-      score += val;
-      answered++;
+nextBtn.onclick = () => {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        showResult();
     }
-  });
+};
 
-  const maxScore = shuffledQuestions.length * 4;
-  const percentage = Math.round((score / maxScore) * 100);
-
-  let message = "";
-  if (answered < shuffledQuestions.length) {
-    message = "Prašome atsakyti į visus klausimus.";
-    document.getElementById("printBtn").style.display = "none";
-  } else if (percentage >= 75) {
-    message = "Jūsų strateginio mąstymo lygis yra aukštas.";
-    document.getElementById("printBtn").style.display = "inline-block";
-  } else if (percentage >= 50) {
-    message = "Jūsų strateginio mąstymo lygis yra vidutinis.";
-    document.getElementById("printBtn").style.display = "inline-block";
-  } else {
-    message = "Rekomenduojama toliau lavinti strateginio mąstymo įgūdžius.";
-    document.getElementById("printBtn").style.display = "inline-block";
-  }
-
-  document.getElementById("result").innerText = `Rezultatas: ${percentage}% – ${message}`;
+function showResult() {
+    document.getElementById('quiz-container').classList.add('hidden');
+    resultEl.classList.remove('hidden');
+    summaryEl.innerHTML = `
+        <p>Sisteminis mąstymas: ${scores.Sisteminis}</p>
+        <p>Perframinimas: ${scores.Perframinimas}</p>
+        <p>Refleksija: ${scores.Refleksija}</p>
+    `;
 }
 
-loadQuiz();
+document.getElementById('download-pdf').onclick = () => {
+    html2pdf().from(resultEl).save('rezultatai.pdf');
+};
+
+showQuestion();
