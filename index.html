@@ -174,13 +174,14 @@
 <label><input type="radio" name="q15" value="3" data-dim="Refleksija"> Analizuoju veiksmus, atvedusius prie sėkmės</label>
 <label><input type="radio" name="q15" value="2" data-dim="Refleksija"> Pasidalinu pamoka su kolegomis</label>
 </div>
+
 </form>
+
 <button onclick="calculateResults()">Gauti rezultatą</button>
 <div id="result"></div>
 <button onclick="downloadPDF()">Atsisiųsti PDF</button>
-</div>
 
-https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jpdf.umd.min.js</script>
 <script>
 function calculateResults() {
   const totalQuestions = document.querySelectorAll('.question').length;
@@ -192,10 +193,9 @@ function calculateResults() {
 
   if (answeredCount < totalQuestions) {
     alert(`Neatsakyti ${totalQuestions - answeredCount} klausimai. Prašome atsakyti į visus klausimus prieš skaičiuojant rezultatą.`);
-    return; // sustabdyti funkciją
+    return;
   }
 
-  // Jei visi atsakyti – skaičiuojame rezultatą
   let total = 0;
   const dims = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
   const counts = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
@@ -209,104 +209,47 @@ function calculateResults() {
   });
 
   const maxTotal = totalQuestions * 5;
+  const dimMap = { 'Sisteminis': 'system', 'Perframinimas': 'perform', 'Refleksija': 'reflect' };
+
   let html = `<h2>Bendras rezultatas: ${total} / ${maxTotal}</h2>`;
   for (let d in dims) {
     const avg = (counts[d] ? dims[d] / counts[d] : 0).toFixed(2);
-    html += `<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAdvice(avg)}</div>`;
+    const advice = getAdvice(dimMap[d], avg);
+    const colorClass = avg < 3 ? 'low' : (avg < 4 ? 'medium' : 'high');
+    html += `<div class="dimension ${colorClass}"><strong>${d}:</strong> ${avg} / 5<br>${advice}</div>`;
   }
   document.getElementById('result').innerHTML = html;
 }
 
-
-// Funkcija, kuri grąžina patarimus pagal balą
+// Dinamiški patarimai
 function getAdvice(dimension, score) {
+  score = parseFloat(score);
   if (dimension === 'system') {
-    if (score < 3) {
-      return `
-        <strong>Sisteminis mąstymas:</strong><br>
-        - Pradėkite nuo paprastų analizės įrankių (5 Kodėl).<br>
-        - Įtraukite duomenis į sprendimų priėmimą.<br>
-        - Mokykitės priežasties-pasekmės ryšių.
-      `;
-    } else if (score < 4) {
-      return `
-        <strong>Sisteminis mąstymas:</strong><br>
-        - Gilinkite analizę naudodami Ishikawa diagramas.<br>
-        - Kartą per savaitę peržiūrėkite sprendimus ir ieškokite sisteminių priežasčių.<br>
-        - Įtraukite KPI stebėseną.
-      `;
-    } else {
-      return `
-        <strong>Sisteminis mąstymas:</strong><br>
-        - Išlaikykite aukštą lygį, dalinkitės metodais su komanda.<br>
-        - Kurkite mokymų medžiagą apie sisteminį požiūrį.<br>
-        - Mentoruokite kitus.
-      `;
-    }
+    if (score < 3) return `<strong>Sisteminis:</strong> Stiprinti analizę: naudokite „5 Kodėl“, Ishikawa diagramas.`;
+    if (score < 4) return `<strong>Sisteminis:</strong> Gilinti analizę: peržiūrėkite sprendimus, įtraukite KPI.`;
+    return `<strong>Sisteminis:</strong> Išlaikyti lygį, dalintis metodais su komanda.`;
   }
-
   if (dimension === 'perform') {
-    if (score < 3) {
-      return `
-        <strong>Performinimas (kritinis požiūris):</strong><br>
-        - Prieš sprendimą sukurkite bent 2–3 alternatyvas.<br>
-        - Naudokite „Raudonos komandos“ metodą.<br>
-        - Įtraukite scenarijų analizę (geriausias/blogiausias).
-      `;
-    } else if (score < 4) {
-      return `
-        <strong>Performinimas:</strong><br>
-        - Lavinkite kritinį požiūrį per diskusijas.<br>
-        - Įtraukite SWOT analizę į projektus.<br>
-        - Vertinkite rizikas prieš sprendimus.
-      `;
-    } else {
-      return `
-        <strong>Performinimas:</strong><br>
-        - Išlaikykite aukštą lygį, dalinkitės patirtimi.<br>
-        - Kurkite „kritinio mąstymo“ dirbtuves.<br>
-        - Mentoruokite kolegas.
-      `;
-    }
+    if (score < 3) return `<strong>Performinimas:</strong> Lavinti kritinį požiūrį: alternatyvos, „Raudonos komandos“ metodas.`;
+    if (score < 4) return `<strong>Performinimas:</strong> Gilinti: SWOT analizė, rizikų vertinimas.`;
+    return `<strong>Performinimas:</strong> Išlaikyti lygį, kurti dirbtuves.`;
   }
-
   if (dimension === 'reflect') {
-    if (score < 3) {
-      return `
-        <strong>Refleksija:</strong><br>
-        - Po kiekvieno projekto atlikite AAR.<br>
-        - Dokumentuokite pamokas.<br>
-        - Dalinkitės su komanda.
-      `;
-    } else if (score < 4) {
-      return `
-        <strong>Refleksija:</strong><br>
-        - Gilinkite analizę po sėkmių ir nesėkmių.<br>
-        - Įtraukite pamokas į procesų tobulinimą.<br>
-        - Kurkite „pamokų duomenų bazę“.
-      `;
-    } else {
-      return `
-        <strong>Refleksija:</strong><br>
-        - Išlaikykite aukštą lygį, dalinkitės gerąja praktika.<br>
-        - Mentoruokite kitus refleksijos metodais.<br>
-        - Kurkite kultūrą, kurioje refleksija yra norma.
-      `;
-    }
+    if (score < 3) return `<strong>Refleksija:</strong> Pradėti nuo AAR, dokumentuoti pamokas.`;
+    if (score < 4) return `<strong>Refleksija:</strong> Gilinti analizę po projektų, kurti pamokų duomenų bazę.`;
+    return `<strong>Refleksija:</strong> Išlaikyti lygį, mentoruoti kitus.`;
   }
+  return `<em>Nerasta patarimų</em>`;
 }
 
-// Įrašome patarimus į HTML
-document.getElementById('system-advice').innerHTML = getAdvice('system', systemScore);
-document.getElementById('perform-advice').innerHTML = getAdvice('perform', performScore);
-document.getElementById('reflect-advice').innerHTML = getAdvice('reflect', reflectScore);
-function downloadPDF(){
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF();
+// PDF generavimas
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
   doc.setFontSize(16);
-  doc.text("Strateginio Mąstymo Testo Rezultatai",10,20);
+  doc.text("Strateginio Mąstymo Testo Rezultatai", 10, 20);
   doc.setFontSize(12);
-  doc.text(document.getElementById('result').innerText,10,40);
+  doc.text(document.getElementById('result').innerText, 10, 40);
   doc.save("Strateginis_Mastymas_Rezultatai.pdf");
 }
 </script>
