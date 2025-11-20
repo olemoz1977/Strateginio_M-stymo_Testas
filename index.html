@@ -23,92 +23,61 @@
   <h1>Strateginio Mąstymo Testas</h1>
   <p>Atsakykite į klausimus ir gaukite rezultatą</p>
 </header>
-<div class="container" id="quiz"></div>
 <div class="container">
-  <button onclick="calculateResults()">Gauti rezultatą</button>
-  <div id="result"></div>
-  <button onclick="downloadPDF()">Atsisiųsti PDF</button>
+<form id="quizForm">
+  <!-- Klausimai -->
+  <div class="question">
+    <h3>1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</h3>
+    <label><input type="radio" name="q1" value="4" data-dim="Sisteminis"> Naudoju formalią matricą</label>
+    <label><input type="radio" name="q1" value="1" data-dim="Sisteminis"> Sutelkiu dėmesį tik į savo skyrių</label>
+    <label><input type="radio" name="q1" value="5" data-dim="Sisteminis"> Analizuoju poveikį visai organizacijai</label>
+    <label><input type="radio" name="q1" value="3" data-dim="Sisteminis"> Paklausiu kitų vadovų nuomonės</label>
+    <label><input type="radio" name="q1" value="2" data-dim="Sisteminis"> Atsižvelgiu į prieštaravimus, bet darau kas geriausia skyriui</label>
+  </div>
+  <!-- >>> Čia analogiškai įdėsiu visus 15 klausimų <<< -->
+</form>
+<button onclick="calculateResults()">Gauti rezultatą</button>
+<div id="result"></div>
+<button onclick="downloadPDF()">Atsisiųsti PDF</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libsjspdf.umd.min.js</script>
+https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const questions=[
-    {text:"Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...",dim:"Sisteminis",options:[
-      {text:"Naudoju formalią matricą",score:4},
-      {text:"Sutelkiu dėmesį tik į savo skyrių",score:1},
-      {text:"Analizuoju poveikį visai organizacijai",score:5}
-    ]},
-    {text:"Susidūrus su klientų praradimu, aš...",dim:"Sisteminis",options:[
-      {text:"Analizuoju vidinius ir išorinius veiksnius",score:5},
-      {text:"Peržiūriu pardavimų ataskaitas",score:2},
-      {text:"Kaltinu pardavimų skyrių",score:1}
-    ]}
-    // >>> Čia įdėsiu visus likusius klausimus analogiškai <<<
-  ];
-
-  const quiz=document.getElementById('quiz');
-  questions.forEach((q,i)=>{
-    const div=document.createElement('div');
-    div.className='question';
-    const h3=document.createElement('h3');
-    h3.textContent=`${i+1}. ${q.text}`;
-    div.appendChild(h3);
-    const opts=document.createElement('div');
-    opts.className='options';
-    q.options.forEach(opt=>{
-      const label=document.createElement('label');
-      const input=document.createElement('input');
-      input.type='radio';
-      input.name=`q${i}`;
-      input.value=opt.score;
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(" "+opt.text));
-      opts.appendChild(label);
-    });
-    div.appendChild(opts);
-    quiz.appendChild(div);
+function calculateResults(){
+  let total=0;
+  const dims={Sisteminis:0,Perframinimas:0,Refleksija:0};
+  const counts={Sisteminis:0,Perframinimas:0,Refleksija:0};
+  document.querySelectorAll('input[type=radio]:checked').forEach(el=>{
+    const val=parseInt(el.value);
+    const dim=el.dataset.dim;
+    total+=val;
+    dims[dim]+=val;
+    counts[dim]++;
   });
-
-  window.calculateResults=function(){
-    let total=0;
-    const dims={Sisteminis:0,Perframinimas:0,Refleksija:0};
-    const counts={Sisteminis:0,Perframinimas:0,Refleksija:0};
-    questions.forEach((q,i)=>{
-      const val=document.querySelector(`input[name="q${i}"]:checked`);
-      if(val){
-        total+=parseInt(val.value);
-        dims[q.dim]+=parseInt(val.value);
-        counts[q.dim]++;
-      }
-    });
-    const maxTotal=questions.length*5;
-    let html=`<h2>Bendras rezultatas: ${total} / ${maxTotal}</h2>`;
-    for(let d in dims){
-      const avg=(counts[d]?dims[d]/counts[d]:0).toFixed(2);
-      html+=`<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAdvice(avg)}</div>`;
-    }
-    document.getElementById('result').innerHTML=html;
-  };
-
-  function getAdvice(score){
-    score=parseFloat(score);
-    if(score>=4.5)return"Puikus strateginis mąstymas – tęskite!";
-    if(score>=3.5)return"Gerai, bet galite dar labiau gilinti analizę.";
-    if(score>=2.5)return"Vidutiniškai – rekomenduojama lavinti kritinį požiūrį.";
-    return"Reikia stipriai tobulinti strateginį mąstymą.";
+  const maxTotal=document.querySelectorAll('.question').length*5;
+  let html=`<h2>Bendras rezultatas: ${total} / ${maxTotal}</h2>`;
+  for(let d in dims){
+    const avg=(counts[d]?dims[d]/counts[d]:0).toFixed(2);
+    html+=`<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAdvice(avg)}</div>`;
   }
-
-  window.downloadPDF=function(){
-    const {jsPDF}=window.jspdf;
-    const doc=new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Strateginio Mąstymo Testo Rezultatai",10,20);
-    doc.setFontSize(12);
-    doc.text(document.getElementById('result').innerText,10,40);
-    doc.save("Strateginis_Mastymas_Rezultatai.pdf");
-  };
-});
+  document.getElementById('result').innerHTML=html;
+}
+function getAdvice(score){
+  score=parseFloat(score);
+  if(score>=4.5)return"Puikus strateginis mąstymas – tęskite!";
+  if(score>=3.5)return"Gerai, bet galite dar labiau gilinti analizę.";
+  if(score>=2.5)return"Vidutiniškai – rekomenduojama lavinti kritinį požiūrį.";
+  return"Reikia stipriai tobulinti strateginį mąstymą.";
+}
+function downloadPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  doc.setFontSize(16);
+  doc.text("Strateginio Mąstymo Testo Rezultatai",10,20);
+  doc.setFontSize(12);
+  doc.text(document.getElementById('result').innerText,10,40);
+  doc.save("Strateginis_Mastymas_Rezultatai.pdf");
+}
 </script>
 </body>
 </html>
