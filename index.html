@@ -25,25 +25,66 @@
 </header>
 <div class="container">
 <form id="quizForm">
-  <!-- Klausimai -->
-  <!-- 1–5: Sisteminis -->
-  <div class="question">
-    <h3>1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</h3>
-    <label><input type="radio" name="q1" value="4" data-dim="Sisteminis"> Naudoju formalią matricą</label>
-    <label><input type="radio" name="q1" value="1" data-dim="Sisteminis"> Sutelkiu dėmesį tik į savo skyrių</label>
-    <label><input type="radio" name="q1" value="5" data-dim="Sisteminis"> Analizuoju poveikį visai organizacijai</label>
-    <label><input type="radio" name="q1" value="3" data-dim="Sisteminis"> Paklausiu kitų vadovų nuomonės</label>
-    <label><input type="radio" name="q1" value="2" data-dim="Sisteminis"> Atsižvelgiu į prieštaravimus, bet darau kas geriausia skyriui</label>
-  </div>
-  <!-- >>> Čia analogiškai įdėkite klausimus 2–15 su 5 atsakymais ir data-dim atributu <<< -->
+
+<!-- 1–5: Sisteminis -->
+<div class="question">
+<h3>1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</h3>
+<label><input type="radio" name="q1" value="4" data-dim="Sisteminis"> Naudoju formalią matricą</label>
+<label><input type="radio" name="q1" value="1" data-dim="Sisteminis"> Sutelkiu dėmesį tik į savo skyrių</label>
+<label><input type="radio" name="q1" value="5" data-dim="Sisteminis"> Analizuoju poveikį visai organizacijai</label>
+<label><input type="radio" name="q1" value="3" data-dim="Sisteminis"> Paklausiu kitų vadovų nuomonės</label>
+<label><input type="radio" name="q1" value="2" data-dim="Sisteminis"> Atsižvelgiu į prieštaravimus, bet darau kas geriausia skyriui</label>
+</div>
+
+<div class="question">
+<h3>2. Susidūrus su klientų praradimu, aš...</h3>
+<label><input type="radio" name="q2" value="5" data-dim="Sisteminis"> Analizuoju vidinius ir išorinius veiksnius</label>
+<label><input type="radio" name="q2" value="2" data-dim="Sisteminis"> Peržiūriu pardavimų ataskaitas</label>
+<label><input type="radio" name="q2" value="1" data-dim="Sisteminis"> Kaltinu pardavimų skyrių</label>
+<label><input type="radio" name="q2" value="4" data-dim="Sisteminis"> Stengiuosi atsekti vidines klaidas</label>
+<label><input type="radio" name="q2" value="3" data-dim="Sisteminis"> Peržiūriu pardavimų ir kokybės duomenis</label>
+</div>
+
+<div class="question">
+<h3>3. Mano požiūris į ilgalaikes tendencijas yra...</h3>
+<label><input type="radio" name="q3" value="2" data-dim="Sisteminis"> Perskaitau naujienas, bet tai neturi įtakos sprendimams</label>
+<label><input type="radio" name="q3" value="5" data-dim="Sisteminis"> Reguliariai inicijuoju scenarijų planavimą</label>
+<label><input type="radio" name="q3" value="1" data-dim="Sisteminis"> Tai aukščiausios vadovybės reikalas</label>
+<label><input type="radio" name="q3" value="3" data-dim="Sisteminis"> Kartais diskutuoju su komanda</label>
+<label><input type="radio" name="q3" value="4" data-dim="Sisteminis"> Nuolat stebiu tendencijas ir peržiūriu prioritetus</label>
+</div>
+
+<div class="question">
+<h3>4. Kai iškyla problemos, kurios viršija mano kompetenciją, aš...</h3>
+<label><input type="radio" name="q4" value="2" data-dim="Sisteminis"> Bandau išspręsti tik savo resursais</label>
+<label><input type="radio" name="q4" value="5" data-dim="Sisteminis"> Ieškau pasikartojančios organizacinės priežasties</label>
+<label><input type="radio" name="q4" value="1" data-dim="Sisteminis"> Perduodu atsakomybę vadovybei</label>
+<label><input type="radio" name="q4" value="3" data-dim="Sisteminis"> Bendradarbiauju su keliais skyriais</label>
+<label><input type="radio" name="q4" value="4" data-dim="Sisteminis"> Inicijuoju tarpfunkcinį susitikimą</label>
+</div>
+
+<div class="question">
+<h3>5. Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...</h3>
+<label><input type="radio" name="q5" value="5" data-dim="Sisteminis"> Kritinių prielaidų nustatymui</label>
+<label><input type="radio" name="q5" value="2" data-dim="Sisteminis"> Išteklių paskirstymui</label>
+<label><input type="radio" name="q5" value="1" data-dim="Sisteminis"> Tikslų nustatymui pagal praėjusius metus</label>
+<label><input type="radio" name="q5" value="4" data-dim="Sisteminis"> Įvairioms rizikoms ir galimybėms</label>
+<label><input type="radio" name="q5" value="3" data-dim="Sisteminis"> Analizei, kaip pasiekti konkurencinį pranašumą</label>
+</div>
+
+<!-- 6–10: Perframinimas -->
+<!-- (Analoginė struktūra su klausimais ir atsakymais) -->
+
+<!-- 11–15: Refleksija -->
+<!-- (Analoginė struktūra su klausimais ir atsakymais) -->
+
 </form>
 <button onclick="calculateResults()">Gauti rezultatą</button>
 <div id="result"></div>
 <button onclick="downloadPDF()">Atsisiųsti PDF</button>
 </div>
 
-<!-- jsPDF biblioteka -->
-<script src="https://cdnjs.cloudflare.com/ajax/libsjspdf.umd.min.js</script>
+https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
 <script>
 function calculateResults(){
   let total=0;
