@@ -6,103 +6,190 @@
 <title>Strateginio Mąstymo Testas</title>
 <style>
     body { background-color: #121212; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: auto; padding: 20px; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
     h1, h2 { text-align: center; }
-    #quiz-container, #result { background: #1e1e1e; padding: 20px; border-radius: 8px; }
-    button { width: 100%; padding: 15px; margin-top: 10px; background: #6200ea; color: #fff; border: none; border-radius: 5px; font-size: 16px; }
-    button:hover { background: #3700b3; }
-    .hidden { display: none; }
-    #answers button { background: #333; margin: 5px 0; }
+    .question { margin-bottom: 20px; padding: 15px; background: #1e1e1e; border-radius: 8px; }
+    .answers button { display: block; width: 100%; margin: 5px 0; padding: 10px; background: #333; color: #fff; border: none; border-radius: 5px; text-align: left; }
+    .answers button.selected { background: #6200ea; }
+    #submit-btn { width: 100%; padding: 15px; margin-top: 20px; background: #6200ea; color: #fff; border: none; border-radius: 5px; font-size: 18px; }
+    #result { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-top: 20px; }
 </style>
 </head>
 <body>
 <div class="container">
     <h1>Strateginio Mąstymo Testas</h1>
-    <div id="quiz-container">
-        <div id="progress"></div>
-        <div id="question"></div>
-        <div id="answers"></div>
-        <button id="next-btn">Kitas</button>
-    </div>
+    <form id="quiz-form"></form>
+    <button id="submit-btn">Pateikti atsakymus</button>
     <div id="result" class="hidden">
         <h2>Jūsų rezultatai</h2>
         <div id="summary"></div>
         <button id="download-pdf">Atsisiųsti PDF</button>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.jspdf.bundle.min.js</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdfml2pdf.bundle.min.js</script>
 <script>
+// Klausimai iš dokumento
 const questions = [
-    { text: "Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...", answers: [
-        { text: "Naudoju formalią matricą...", score: 4, dim: "Sisteminis" },
-        { text: "Ignoruoju kitus skyrius...", score: 1, dim: "Sisteminis" },
-        { text: "Analizuoju visos organizacijos grandinę...", score: 5, dim: "Sisteminis" }
+    // I. Sisteminis mąstymas
+    { text: "1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...", dim: "Sisteminis", answers: [
+        { text: "Naudoju formalią matricą...", score: 4 },
+        { text: "Ignoruoju kitus skyrius...", score: 1 },
+        { text: "Analizuoju visos organizacijos grandinę...", score: 5 },
+        { text: "Paklausiu kitų vadovų nuomonės...", score: 3 },
+        { text: "Atsižvelgiu į prieštaravimus, bet darau kas geriausia mano skyriui...", score: 2 }
     ]},
-    { text: "Susidūrus su klientų praradimu, aš...", answers: [
-        { text: "Analizuoju rinkos pokyčius ir konkurentus...", score: 5, dim: "Sisteminis" },
-        { text: "Peržiūriu paskutinių savaičių pardavimus...", score: 2, dim: "Sisteminis" },
-        { text: "Kaltinu pardavimų skyrių...", score: 1, dim: "Sisteminis" }
+    { text: "2. Susidūrus su klientų praradimu, aš...", dim: "Sisteminis", answers: [
+        { text: "Analizuoju rinkos pokyčius ir konkurentus...", score: 5 },
+        { text: "Peržiūriu paskutinių savaičių pardavimus...", score: 2 },
+        { text: "Kaltinu pardavimų skyrių...", score: 1 },
+        { text: "Ieškau vidinių klaidų (IT, procesai)...", score: 4 },
+        { text: "Peržiūriu pardavimų ir kokybės duomenis...", score: 3 }
+    ]},
+    { text: "3. Mano požiūris į ilgalaikes tendencijas (AI, reguliavimas)...", dim: "Sisteminis", answers: [
+        { text: "Skaitau naujienas, bet tai neturi įtakos sprendimams...", score: 2 },
+        { text: "Inicijuoju scenarijų planavimą kas 5 metus...", score: 5 },
+        { text: "Tai aukščiausios vadovybės reikalas...", score: 1 },
+        { text: "Kartais diskutuoju su komanda...", score: 3 },
+        { text: "Stebiu tendencijas ir peržiūriu prioritetus kas ketvirtį...", score: 4 }
+    ]},
+    { text: "4. Kai iškyla problemos, kurios viršija mano kompetenciją, aš...", dim: "Sisteminis", answers: [
+        { text: "Bandau išspręsti tik savo resursais...", score: 2 },
+        { text: "Ieškau organizacinės priežasties...", score: 5 },
+        { text: "Perduodu atsakomybę ir nustoju stebėti...", score: 1 },
+        { text: "Bendradarbiauju su keliais skyriais...", score: 3 },
+        { text: "Inicijuoju tarpfunkcinį susitikimą...", score: 4 }
+    ]},
+    { text: "5. Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...", dim: "Sisteminis", answers: [
+        { text: "Kritinių prielaidų nustatymui ir planams...", score: 5 },
+        { text: "Išteklių paskirstymui pagal dabartinius prioritetus...", score: 2 },
+        { text: "Tikslams pagal praėjusių metų rezultatus...", score: 1 },
+        { text: "Rizikoms ir galimybėms (vidiniai/išoriniai)...", score: 4 },
+        { text: "Konkurenciniam pranašumui artimiausiu metu...", score: 3 }
+    ]},
+    // II. Perframinimas
+    { text: "6. Komandai nepavykstant įveikti kliūties, aš...", dim: "Perframinimas", answers: [
+        { text: "Liepiu sustabdyti veiklą ir sugalvoti 5 naujus būdus...", score: 4 },
+        { text: "Organizuoju dirbtuves iš kito vaidmens perspektyvos...", score: 5 },
+        { text: "Paprašau 3-4 naujų, bet panašių planų...", score: 2 },
+        { text: "Primenu naudoti patvirtintas taktikas...", score: 1 },
+        { text: "Inicijuoju diskusiją su radikaliai kitomis idėjomis...", score: 3 }
+    ]},
+    { text: "7. Ruošiantis svarbiam sprendimui, aš visada...", dim: "Perframinimas", answers: [
+        { text: "Kuriu kelis nesuderinamus scenarijus...", score: 5 },
+        { text: "Ieškau objektyvių duomenų tarp dviejų pasirinkimų...", score: 2 },
+        { text: "Prašau komandos surinkti duomenis patvirtinimui ir paneigimui...", score: 3 },
+        { text: "Ieškau įrodymų, patvirtinančių mano idėją...", score: 1 },
+        { text: "Ieškau aktyvių oponentų ir jų pasiūlymų...", score: 4 }
+    ]},
+    { text: "8. Susidūrus su sudėtingu tikslu, aš...", dim: "Perframinimas", answers: [
+        { text: "Naudoju tik išbandytus metodus...", score: 1 },
+        { text: "Naudoju pramonės standartus (SWOT)...", score: 2 },
+        { text: "Ieškau nekonvencinių sprendimų...", score: 4 },
+        { text: "Tikrinu, ar tikslas teisingas, gal keičiu kryptį...", score: 5 },
+        { text: "Adaptuoju metodus iš kitų pramonės šakų...", score: 3 }
+    ]},
+    { text: "9. Iškilo netikėta nauja problema. Aš...", dim: "Perframinimas", answers: [
+        { text: "Pritaikau standartines procedūras...", score: 2 },
+        { text: "Ieškau analogiškų sprendimų savo patirtyje...", score: 1 },
+        { text: "Ieškau sprendimų iš kitų pramonės šakų...", score: 4 },
+        { text: "Pasitelkiu išorinius ekspertus...", score: 3 },
+        { text: "Dekonstruoju problemą ir apverčiu prielaidas...", score: 5 }
+    ]},
+    { text: "10. Kai komanda generuoja idėjas, mano vaidmuo yra...", dim: "Perframinimas", answers: [
+        { text: "Atmesti rizikingas idėjas...", score: 2 },
+        { text: "Užtikrinti realistiškumą ir biudžetą...", score: 1 },
+        { text: "Paskirti „advokato velnio“ poziciją...", score: 5 },
+        { text: "Leisti generuoti laisvai, bet pasirinkti akivaizdų variantą...", score: 3 },
+        { text: "Skatinti idėjas, prieštaraujančias strategijai...", score: 4 }
+    ]},
+    // III. Refleksija
+    { text: "11. Po didelės sėkmės/nesėkmės, aš...", dim: "Refleksija", answers: [
+        { text: "Naudoju rezultatus strateginiam dienoraščiui...", score: 5 },
+        { text: "Surengiu trumpą susitikimą...", score: 2 },
+        { text: "Greitai einu prie kito darbo...", score: 1 },
+        { text: "Organizuoju struktūrizuotą peržiūrą...", score: 4 },
+        { text: "Parašau trumpą atmintinę komandos nariams...", score: 3 }
+    ]},
+    { text: "12. Aš aktyviai ieškau kritinio grįžtamojo ryšio...", dim: "Refleksija", answers: [
+        { text: "Iš nepriklausomų patarėjų...", score: 5 },
+        { text: "Tik iš palaikančių asmenų...", score: 2 },
+        { text: "Iš platesnio rato, įskaitant oponentus...", score: 4 },
+        { text: "Tik tada, kai prašo...", score: 1 },
+        { text: "Iš tiesioginių pavaldinių ir vadovų...", score: 3 }
+    ]},
+    { text: "13. Kai analizuoju praeities klaidas, ieškau...", dim: "Refleksija", answers: [
+        { text: "Pamokų ateičiai...", score: 3 },
+        { text: "Klaidų padariusių asmenų...", score: 1 },
+        { text: "Klaidingų prielaidų...", score: 4 },
+        { text: "Organizacinių tendencijų ir mokymosi sistemos...", score: 5 },
+        { text: "Akivaizdžių sistemų trūkumų...", score: 2 }
+    ]},
+    { text: "14. Mano nuomonė apie strategijos keitimą yra...", dim: "Refleksija", answers: [
+        { text: "Keisti tik po analizės...", score: 4 },
+        { text: "Keitimas rodo silpnumą...", score: 1 },
+        { text: "Keisti tik metų pabaigoje...", score: 3 },
+        { text: "Keisti tik po blogų rezultatų...", score: 2 },
+        { text: "Keisti nedelsiant gavus naujų duomenų...", score: 5 }
+    ]},
+    { text: "15. Priėmęs sėkmingą sprendimą, aš...", dim: "Refleksija", answers: [
+        { text: "Dokumentuoju sąlygas pakartojimui...", score: 4 },
+        { text: "Tiesiog džiaugiuosi ir einu toliau...", score: 1 },
+        { text: "Išvedu bendrą principą ir testuoju kitur...", score: 5 },
+        { text: "Analizuoju veiksmus, atvedusius prie sėkmės...", score: 3 },
+        { text: "Pasidalinu pamoka su kolegomis...", score: 2 }
     ]}
-    // Galite pridėti likusius klausimus čia
 ];
 
-let currentQuestion = 0;
-let scores = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
-
-const questionEl = document.getElementById('question');
-const answersEl = document.getElementById('answers');
-const progressEl = document.getElementById('progress');
-const nextBtn = document.getElementById('next-btn');
-const resultEl = document.getElementById('result');
-const summaryEl = document.getElementById('summary');
-
-function showQuestion() {
-    const q = questions[currentQuestion];
-    questionEl.textContent = q.text;
-    answersEl.innerHTML = '';
-    q.answers.forEach(a => {
+// Dinamiškai sugeneruojame klausimus
+const form = document.getElementById('quiz-form');
+questions.forEach((q) => {
+    const div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = `<p>${q.text}</p>`;
+    const answersDiv = document.createElement('div');
+    answersDiv.className = 'answers';
+    q.answers.forEach((a) => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.textContent = a.text;
         btn.onclick = () => {
-            scores[a.dim] += a.score;
-            nextBtn.disabled = false;
+            Array.from(answersDiv.children).forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            btn.dataset.score = a.score;
         };
-        answersEl.appendChild(btn);
+        answersDiv.appendChild(btn);
     });
-    progressEl.textContent = `${currentQuestion + 1}/${questions.length}`;
-    nextBtn.disabled = true;
-}
+    div.appendChild(answersDiv);
+    form.appendChild(div);
+});
 
-nextBtn.onclick = () => {
-    currentQuestion++;
-    if (currentQuestion < questions.length) {
-        showQuestion();
-    } else {
-        showResult();
+// Rezultatų skaičiavimas
+document.getElementById('submit-btn').onclick = () => {
+    let scores = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
+    const questionsDivs = document.querySelectorAll('.question');
+    questionsDivs.forEach((div, i) => {
+        const selected = div.querySelector('.selected');
+        if (selected) {
+            scores[questions[i].dim] += parseInt(selected.dataset.score);
+        }
+    });
+    function interpret(score) {
+        if (score <= 15) return "Žemas";
+        if (score <= 25) return "Vidutinis";
+        return "Aukštas";
     }
-};
-
-function interpret(score) {
-    if (score <= 15) return "Žemas";
-    if (score <= 25) return "Vidutinis";
-    return "Aukštas";
-}
-
-function showResult() {
-    document.getElementById('quiz-container').classList.add('hidden');
-    resultEl.classList.remove('hidden');
-    summaryEl.innerHTML = `
+    document.getElementById('summary').innerHTML = `
         <p><strong>Sisteminis mąstymas:</strong> ${scores.Sisteminis} (${interpret(scores.Sisteminis)})</p>
         <p><strong>Perframinimas:</strong> ${scores.Perframinimas} (${interpret(scores.Perframinimas)})</p>
         <p><strong>Refleksija:</strong> ${scores.Refleksija} (${interpret(scores.Refleksija)})</p>
     `;
-}
-
-document.getElementById('download-pdf').onclick = () => {
-    html2pdf().from(resultEl).save('rezultatai.pdf');
+    document.getElementById('result').classList.remove('hidden');
 };
 
-showQuestion();
+// PDF atsisiuntimas
+document.getElementById('download-pdf').onclick = () => {
+    html2pdf().from(document.getElementById('result')).save('rezultatai.pdf');
+};
 </script>
 </body>
-</html>
