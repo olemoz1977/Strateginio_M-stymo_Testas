@@ -5,233 +5,285 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strateginis Mąstymas Testas</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #121212;
-        color: #f1f1f1;
-        margin: 0;
-        padding: 0;
-    }
-    header {
-        text-align: center;
-        padding: 20px;
-        background-color: #1f1f1f;
-    }
-    h1 { color: #00bcd4; }
-    .container {
-        max-width: 800px;
-        margin: auto;
-        padding: 20px;
-    }
-    .question {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: #1e1e1e;
-        border-radius: 8px;
-    }
-    .question h3 { margin-bottom: 10px; }
-    .options label {
-        display: block;
-        margin-bottom: 8px;
-        cursor: pointer;
-    }
-    button {
-        background-color: #00bcd4;
-        color: #fff;
-        border: none;
-        padding: 12px 20px;
-        font-size: 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-    button:hover { background-color: #0097a7; }
-    #result {
-        margin-top: 30px;
-        padding: 20px;
-        background: #1e1e1e;
-        border-radius: 8px;
-    }
-    .dimension {
-        margin-bottom: 15px;
-    }
+  :root{
+    --bg:#121212; --card:#1e1e1e; --header:#1f1f1f; --accent:#00bcd4; --accent-hover:#0097a7; --text:#f1f1f1; --muted:#bbbbbb;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Arial, sans-serif;background-color:var(--bg);color:var(--text);margin:0}
+  header{background:var(--header);padding:24px 16px;text-align:center}
+  h1{color:var(--accent);margin:0 0 8px}
+  .container{max-width:860px;margin:0 auto;padding:16px}
+  .question{background:var(--card);border-radius:10px;padding:16px;margin:12px 0}
+  .question h3{margin:0 0 10px;font-size:1rem}
+  .dim-tag{color:var(--muted);font-size:.85rem;margin-bottom:8px}
+  .options label{display:block;line-height:1.4;margin:8px 0;cursor:pointer}
+  .options input{margin-right:8px}
+  button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}
+  button:hover{background:var(--accent-hover)}
+  #result{background:var(--card);border-radius:10px;padding:16px;margin-top:16px;white-space:pre-line}
+  .dimension{margin:10px 0;padding:10px;border-left:4px solid var(--accent);background:#232323;border-radius:8px}
+  .error{background:#3a1f1f;border-left:4px solid #e57373;color:#ffdddd}
+  .footer-note{color:var(--muted);font-size:.85rem;margin-top:8px}
 </style>
 </head>
 <body>
 <header>
-    <h1>Strateginio Mąstymo Testas</h1>
-    <p>Atsakykite į klausimus ir gaukite savo rezultatą</p>
+  <h1>Strateginio Mąstymo Testas</h1>
+  <p>Atsakykite į klausimus ir gaukite savo rezultatą</p>
 </header>
+
 <div class="container" id="quiz"></div>
+
 <div class="container">
-    <button onclick="calculateResults()">Gauti Rezultatą</button>
-    <div id="result"></div>
-    <button onclick="downloadPDF()">Atsisiųsti PDF</button>
+  <button id="calcBtn">Gauti rezultatą</button>
+  <div id="result"></div>
+  <button id="pdfBtn">Atsisiųsti PDF</button>
+  <p class="footer-note">Pastaba: norint gauti PDF, pirmiausia sugeneruokite rezultatą.</p>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspf.umd.min.js</script>
-<script>
-const questions = [
-    // I. Sisteminis Mąstymas (1-5)
-    {text:"Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...", dim:"Sisteminis", options:[
-        {text:"Naudoju formalią matricą...", score:4},
-        {text:"Sutelkiu dėmesį tik į savo skyrių...", score:1},
-        {text:"Analizuoju poveikį visos organizacijos grandinei...", score:5},
-        {text:"Paklausiu kitų vadovų nuomonės...", score:3},
-        {text:"Atsižvelgiu į prieštaravimus, bet darau kas geriausia skyriui...", score:2}
-    ]},
-    {text:"Susidūrus su klientų praradimu, aš...", dim:"Sisteminis", options:[
-        {text:"Analizuoju vidinius ir išorinius veiksnius...", score:5},
-        {text:"Peržiūriu paskutinių savaičių pardavimus...", score:2},
-        {text:"Kaltinu pardavimų skyrių...", score:1},
-        {text:"Stengiuosi atsekti vidines klaidas...", score:4},
-        {text:"Peržiūriu pardavimų ir kokybės duomenis...", score:3}
-    ]},
-    {text:"Mano požiūris į ilgalaikes makroekonomines ir technologines tendencijas yra...", dim:"Sisteminis", options:[
-        {text:"Perskaitau naujienas, bet tai neturi įtakos sprendimams...", score:2},
-        {text:"Reguliariai inicijuoju scenarijų planavimą...", score:5},
-        {text:"Tai aukščiausios vadovybės reikalas...", score:1},
-        {text:"Kartais diskutuoju su komanda...", score:3},
-        {text:"Nuolat stebiu tendencijas ir peržiūriu prioritetus...", score:4}
-    ]},
-    {text:"Kai iškyla problemos, kurios viršija mano skyriaus kompetenciją, aš...", dim:"Sisteminis", options:[
-        {text:"Bandau išspręsti tik savo resursais...", score:2},
-        {text:"Ieškau pasikartojančios organizacinės priežasties...", score:5},
-        {text:"Perduodu atsakomybę aukštesnei vadovybei...", score:1},
-        {text:"Bendradarbiauju su keliais skyriais...", score:3},
-        {text:"Inicijuoju tarpfunkcinį susitikimą...", score:4}
-    ]},
-    {text:"Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...", dim:"Sisteminis", options:[
-        {text:"Kritinių prielaidų nustatymui ir planams...", score:5},
-        {text:"Išteklių paskirstymui pagal dabartinius prioritetus...", score:2},
-        {text:"Tikslų nustatymui pagal praėjusius metus...", score:1},
-        {text:"Įvairioms rizikoms ir galimybėms...", score:4},
-        {text:"Analizei, kaip pasiekti konkurencinį pranašumą...", score:3}
-    ]},
-    // II. Perframinimas (6-10)
-    {text:"Komandai nepavykstant įveikti kliūties, aš...", dim:"Perframinimas", options:[
-        {text:"Liepiu sustabdyti veiklą ir sugalvoti 5 būdus...", score:4},
-        {text:"Organizuoju dirbtuves iš kito vaidmens perspektyvos...", score:5},
-        {text:"Paprašau 3-4 naujų, bet panašių planų...", score:2},
-        {text:"Primenu naudoti patvirtintas taktikas...", score:1},
-        {text:"Inicijuoju diskusiją su radikaliai kitomis idėjomis...", score:3}
-    ]},
-    {text:"Ruošiantis svarbiam sprendimui, aš visada...", dim:"Perframinimas", options:[
-        {text:"Kuriu nesuderinamus scenarijus...", score:5},
-        {text:"Ieškau objektyvių duomenų tarp dviejų pasirinkimų...", score:2},
-        {text:"Prašau komandos surinkti duomenis patvirtinimui ir paneigimui...", score:3},
-        {text:"Ieškau įrodymų, patvirtinančių mano idėją...", score:1},
-        {text:"Ieškau aktyvių oponentų...", score:4}
-    ]},
-    {text:"Susidūrus su sudėtingu tikslu, aš...", dim:"Perframinimas", options:[
-        {text:"Naudoju tik išbandytus metodus...", score:1},
-        {text:"Naudoju populiarius pramonės standartus...", score:2},
-        {text:"Ieškau nekonvencinių sprendimų...", score:4},
-        {text:"Manau, kad tikslas gali būti klaidingas...", score:5},
-        {text:"Adaptuoju metodus iš kitų pramonės šakų...", score:3}
-    ]},
-    {text:"Iškilo netikėta nauja problema. Aš...", dim:"Perframinimas", options:[
-        {text:"Taikau standartines procedūras...", score:2},
-        {text:"Ieškau analogiškų sprendimų savo patirtyje...", score:1},
-        {text:"Ieškau sprendimų iš kitų pramonės šakų...", score:4},
-        {text:"Pasitelkiu išorinius ekspertus...", score:3},
-        {text:"Dekonstruoju problemą ir apverčiu prielaidas...", score:5}
-    ]},
-    {text:"Kai komanda generuoja idėjas, mano vaidmuo yra...", dim:"Perframinimas", options:[
-        {text:"Atmesti rizikingas idėjas...", score:2},
-        {text:"Užtikrinti realistiškumą ir biudžetą...", score:1},
-        {text:"Paskirti „advokato velnio“ poziciją...", score:5},
-        {text:"Leisti generuoti laisvai, bet pasirinkti akivaizdų variantą...", score:3},
-        {text:"Skatinti idėjas, prieštaraujančias strategijai...", score:4}
-    ]},
-    // III. Refleksija (11-15)
-    {text:"Po didelės sėkmės/nesėkmės, aš...", dim:"Refleksija", options:[
-        {text:"Naudoju rezultatus strateginiam dienoraščiui...", score:5},
-        {text:"Surengiu trumpą susitikimą...", score:2},
-        {text:"Greitai einu prie kito darbo...", score:1},
-        {text:"Organizuoju struktūrizuotą peržiūrą...", score:4},
-        {text:"Parašau trumpą atmintinę...", score:3}
-    ]},
-    {text:"Aš aktyviai ieškau kritinio grįžtamojo ryšio...", dim:"Refleksija", options:[
-        {text:"Iš nepriklausomų patarėjų...", score:5},
-        {text:"Tik iš palaikančių asmenų...", score:2},
-        {text:"Iš platesnio suinteresuotųjų rato...", score:4},
-        {text:"Tik tada, kai prašo...", score:1},
-        {text:"Iš tiesioginių pavaldinių ir vadovų...", score:3}
-    ]},
-    {text:"Kai analizuoju praeities klaidas, ieškau...", dim:"Refleksija", options:[
-        {text:"Pamokų ateičiai...", score:3},
-        {text:"Klaidų padariusių asmenų...", score:1},
-        {text:"Klaidingų prielaidų...", score:4},
-        {text:"Organizacinių tendencijų...", score:5},
-        {text:"Akivaizdžių sistemų trūkumų...", score:2}
-    ]},
-    {text:"Mano nuomonė apie strategijos keitimą yra...", dim:"Refleksija", options:[
-        {text:"Strategija turi būti peržiūrima, bet keitimai po analizės...", score:4},
-        {text:"Tai rodo silpnumą...", score:1},
-        {text:"Keisti galima tik metų pabaigoje...", score:3},
-        {text:"Keisti reikia tik esant blogiems rezultatams...", score:2},
-        {text:"Strateginis planavimas yra nuolatinė funkcija...", score:5}
-    ]},
-    {text:"Priėmęs svarbų sprendimą, kuris pasirodė sėkmingas, aš...", dim:"Refleksija", options:[
-        {text:"Dokumentuoju sėkmės istoriją...", score:4},
-        {text:"Tiesiog džiaugiuosi sėkme...", score:1},
-        {text:"Išvedu bendrą principą...", score:5},
-        {text:"Analizuoju veiksmus, atvedusius prie sėkmės...", score:3},
-        {text:"Pasidalinu pamoka su kolegomis...", score:2}
-    ]}
-];
+<!-- jsPDF iš CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        integrity="sha512-6wHqjv2QeXxIuGQy0oX7bR3YQkQWun1qCk0wE2bC7WcQ9t1f0t5u8kH6G4Gf2nQeQnCq9Qz4E3bW8m9uS6y2Vis Mąstymas (1–5)
+      {text:"Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...", dim:"Sisteminis", options:[
+        {text:"...naudoju formalią matricą, kad įvertinčiau tiesioginį poveikį visiems susijusiems skyriams ir skyrių motyvacijai.", score:4},
+        {text:"...visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą, ignoruodamas galimus padarinius kitur.", score:1},
+        {text:"...analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei, kad užtikrinčiau, jog pokytis nepažeis bendro įmonės konkurencinio pranašumo.", score:5},
+        {text:"...paklausiu kelių kitų skyrių vadovų nuomonės apie galimus neigiamus padarinius jų darbui.", score:3},
+        {text:"...atsižvelgiu į gretimų skyrių prieštaravimus, bet vis tiek darau tai, kas geriausia mano skyriui.", score:2}
+      ]},
+      {text:"Susidūrus su klientų praradimu, aš...", dim:"Sisteminis", options:[
+        {text:"...analizuoju ne tik vidinius procesus, bet ir išorinius rinkos pokyčius bei konkurentų veiksmus, siekdamas atpažinti ilgalaikes tendencijas, kurios galėjo pakeisti klientų poreikius.", score:5},
+        {text:"...peržiūriu paskutinių savaičių pardavimų ataskaitas, kad pamatyčiau, kurioje srityje praradome daugiausiai.", score:2},
+        {text:"...iš karto kaltinu pardavimų skyrių ir reikalauju nedelsiant padidinti pardavimus per šį mėnesį.", score:1},
+        {text:"...stengiuosi atsekti, kokios vidinės klaidos (pvz., IT sistemos lėtumas ar biurokratiniai procesai) lėmė klientų patirties pablogėjimą.", score:4},
+        {text:"...peržiūriu tiek pardavimų, tiek produktų kokybės duomenis, ieškodamas akivaizdžių nesutapimų.", score:3}
+      ]},
+      {text:"Mano požiūris į ilgalaikes makroekonomines ir technologines tendencijas (pvz., AI, reguliavimas) yra...", dim:"Sisteminis", options:[
+        {text:"...aš perskaitau pagrindines naujienas, bet tai neturi įtakos mano savaitiniams sprendimams.", score:2},
+        {text:"...aš reguliariai inicijuoju scenarijų planavimo susitikimus, kad įvertinčiau, kaip šios tendencijos gali priversti mūsų įmonę fundamentaliai pakeisti verslo modelį per ateinančius 5 metus.", score:5},
+        {text:"...kad tai yra aukščiausios vadovybės reikalas, o aš turiu susitelkti į šiandienos rezultatus.", score:1},
+        {text:"...aš kartais diskutuoju apie tai su komanda, bandydamas rasti idėjų, bet neturiu nuolatinio proceso.", score:3},
+        {text:"...aš nuolat stebiu šias tendencijas ir peržiūriu savo skyriaus prioritetus kas ketvirtį.", score:4}
+      ]},
+      {text:"Kai iškyla problemos, kurios viršija mano skyriaus kompetenciją, aš...", dim:"Sisteminis", options:[
+        {text:"...bandau išspręsti problemą tik savo skyriaus resursais, kad parodyčiau efektyvumą.", score:2},
+        {text:"...sistemiškai ieškau pasikartojančios organizacinės priežasties (pvz., neaiškių atsakomybių, silpnų IT sąsajų), dėl kurios ši problema nuolat atsiranda keliuose skyriuose.", score:5},
+        {text:"...visą atsakomybę perduodu aukštesnei vadovybei arba kitam skyriui, ir nustoju stebėti eigą.", score:1},
+        {text:"...bendradarbiauju su vienu ar dviem susijusiais skyriais, kad rasčiau kompromisą.", score:3},
+        {text:"...inicijuoju tarpfunkcinį (angl. cross-functional) susitikimą, kad išanalizuočiau, kaip problemai spręsti reikia bendros kelių skyrių sistemos.", score:4}
+      ]},
+      {text:"Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...", dim:"Sisteminis", options:[
+        {text:"...kritinių prielaidų nustatymui apie ateitį (pvz., ar rinka augs, ar technologijos keisis) ir planų kūrimui, kaip veiksime, jei tos prielaidos pasirodys klaidingos.", score:5},
+        {text:"...išteklių paskirstymui pagal dabartinius projektų prioritetus.", score:2},
+        {text:"...tikslų nustatymui, pagrįstam praėjusių metų rezultatais.", score:1},
+        {text:"...įvairioms rizikoms ir galimybėms, įtraukiant tiek vidinius, tiek išorinius veiksnius.", score:4},
+        {text:"...išsamiai analizei, kaip pasiekti konkurencinį pranašumą artimiausiu metu (iki 1 metų).", score:3}
+      ]},
 
-const quizDiv = document.getElementById('quiz');
-questions.forEach((q,i)=>{
-    const div = document.createElement('div');
-    div.className='question';
-    div.innerHTML=`<h3>${i+1}. ${q.text}</h3>`;
-    const opts = document.createElement('div');
-    opts.className='options';
-    q.options.forEach((opt,j)=>{
-        opts.innerHTML += `<label><input type="radio" name="q${i}" value="${opt.score}"> ${opt.text}</label>`;
+      // II. Perframinimas (6–10)
+      {text:"Komandai nepavykstant įveikti sudėtingos kliūties (pvz., nepasiekiami pardavimų tikslai), aš...", dim:"Perframinimas", options:[
+        {text:"...liepiu komandai pilnai sustabdyti veiklą ir sugalvoti 5 skirtingus būdus, kaip būtų galima iš naujo apibrėžti problemą (pvz., ne „pardavimų trūkumas“, o „vertės pasiūlymo neatitikimas“).", score:4},
+        {text:"...organizuoju dirbtuves, kurios skirtos problemai spręsti iš kito vaidmens perspektyvos (pvz., „Ką darytų mūsų konkurentas/klientas šioje situacijoje?“), kad sugeneruotume visiškai naują požiūrį.", score:5},
+        {text:"...paprašau jų pateikti 3–4 naujus, bet panašius veiksmų planus.", score:2},
+        {text:"...primenu jiems, kad reikia stengtis labiau ir naudoti jau patvirtintas taktikas.", score:1},
+        {text:"...inicijuoju diskusiją, kurios metu siūlomos ir radikaliai kitokios idėjos.", score:3}
+      ]},
+      {text:"Ruošiantis svarbiam sprendimui, aš visada...", dim:"Perframinimas", options:[
+        {text:"...inicijuoju procesą, kurio metu sąmoningai kuriami keli nesuderinami scenarijai (pvz., geriausias, blogiausias, neįtikėtinas), kad išvengčiau „tunelinio mąstymo“ ir parengčiau save staigiems pokyčiams.", score:5},
+        {text:"...ieškau objektyvių duomenų, kurie padėtų apsispręsti tarp dviejų akivaizdžių pasirinkimų.", score:2},
+        {text:"...prašau komandos surinkti duomenis, kurie patvirtintų ir paneigtų mano pradinę idėją.", score:3},
+        {text:"...ieškau įrodymų, kurie patvirtintų mano pradinę idėją ir požiūrį.", score:1},
+        {text:"...ieškau aktyvių oponentų (žmonių su priešinga nuomone) ir prašau jų paruošti atsakomąjį pasiūlymą, kad iššūkčiau savo prielaidoms.", score:4}
+      ]},
+      {text:"Susidūrus su sudėtingu tikslu, aš...", dim:"Perframinimas", options:[
+        {text:"...naudoju tik tuos metodus ir įrankius, kuriuos jau esu išbandęs anksčiau ir žinau, kad veikia.", score:1},
+        {text:"...naudoju populiariausius pramonės standartus (pvz., SWOT) analizei atlikti.", score:2},
+        {text:"...ieškau visiškai nekonvencinių ir kūrybinių sprendimų, kurie gali atrodyti rizikingi, bet duoti didžiulę grąžą.", score:4},
+        {text:"...manau, kad paties tikslo apibrėžimas gali būti klaidingas, todėl prieš dirbdamas bandau išsiaiškinti tikrąjį verslo poreikį ir galbūt pakeisti kryptį.", score:5},
+        {text:"...svarstau apie metodų adaptavimą iš kitų pramonės šakų (pvz., logistikos metodai IT projektui).", score:3}
+      ]},
+      {text:"Iškilo netikėta nauja problema. Aš...", dim:"Perframinimas", options:[
+        {text:"...bandau pritaikyti standartines organizacijos procedūras naujai problemai.", score:2},
+        {text:"...gaištu laiką ieškodamas analogiškų problemų sprendimų savo patirtyje.", score:1},
+        {text:"...sistemiškai ieškau sprendimų, sėkmingai taikytų visiškai skirtingose pramonėse, kad atversčiau požiūrį.", score:4},
+        {text:"...greitai pasitelkiu išorinius ekspertus, kad gaučiau patikrintą sprendimą.", score:3},
+        {text:"...sistemiškai dekonstruoju problemą, nustatydamas visas prielaidas, ir bandau jas apversti (pvz., „O kas, jei mes niekada neišspręsime šios problemos, bet ją apeisime?“).", score:5}
+      ]},
+      {text:"Kai komanda generuoja idėjas, mano vaidmuo yra...", dim:"Perframinimas", options:[
+        {text:"...iš karto atmesti bet kokias idėjas, kurios atrodo per daug rizikingos.", score:2},
+        {text:"...užtikrinti, kad idėjos būtų realistiškos ir atitiktų dabartinį biudžetą.", score:1},
+        {text:"...paskirti asmenį „advokato velnio“ pozicijai, kuris privalo abejoti prielaidomis ir tikslais.", score:5},
+        {text:"...leisti generuoti laisvai, bet galiausiai pasirinkti geriausią iš akivaizdžių variantų.", score:3},
+        {text:"...aktyviai paskatinti komandą generuoti idėjas, kurios prieštarautų dabartinei strategijai ir atrodytų neįgyvendinamos per artimiausius metus.", score:4}
+      ]},
+
+      // III. Refleksija (11–15)
+      {text:"Po didelės sėkmės/nesėkmės, aš...", dim:"Refleksija", options:[
+        {text:"...naudoju rezultatus kaip medžiagą asmeniniam strateginiam dienoraščiui, kad suformuluočiau naujas taisykles ar metodologijas.", score:5},
+        {text:"...surengiu trumpą susitikimą rezultatams aptarti ir padėkoti komandai.", score:2},
+        {text:"...greitai einu prie kito darbo, nes praeitis neturi įtakos ateičiai.", score:1},
+        {text:"...organizuoju struktūrizuotą peržiūrą, kur dokumentuojamos ne tik išvados, bet ir prielaidos.", score:4},
+        {text:"...parašau trumpą atmintinę apie pagrindines pamokas, skirtą tik komandos nariams.", score:3}
+      ]},
+      {text:"Aš aktyviai ieškau kritinio grįžtamojo ryšio apie savo sprendimų priėmimo procesą...", dim:"Refleksija", options:[
+        {text:"...iš nepriklausomų patarėjų ar vadovų iš kitų pramonės šakų – kad aptikčiau „akląsias zonas“.", score:5},
+        {text:"...tik iš tų asmenų, kuriais pasitikiu ir kurie palaiko mano sprendimus.", score:2},
+        {text:"...iš platesnio suinteresuotųjų šalių rato, įskaitant nesutinkančius.", score:4},
+        {text:"...tik tada, kai man jo prašo.", score:1},
+        {text:"...iš savo tiesioginių pavaldinių ir vadovų.", score:3}
+      ]},
+      {text:"Kai analizuoju praeities klaidas, aš visų pirma ieškau...", dim:"Refleksija", options:[
+        {text:"...pamokų, kurios padėtų išvengti tų pačių klaidų ateityje.", score:3},
+        {text:"...klaidų padariusių asmenų, kad užtikrinčiau atsakomybę.", score:1},
+        {text:"...prielaidų, kuriomis buvo remiamasi priimant sprendimus – kad atpažinčiau klaidingas anksčiau.", score:4},
+        {text:"...kaip klaidos atspindi platesnes organizacines tendencijas ar kultūrines spragas, ir kuriu mokymosi sistemą.", score:5},
+        {text:"...akivaizdžių sistemų trūkumų, kad juos greitai pataisyčiau.", score:2}
+      ]},
+      {text:"Mano nuomonė apie strategijos keitimą (perplanavimą) yra...", dim:"Refleksija", options:[
+        {text:"...strategija turi būti nuolat peržiūrima, bet pakeitimai daromi tik po išsamios analizės.", score:4},
+        {text:"...tai rodo silpnumą ir neapgalvotą pradinį planą – stengiuosi laikytis pirminio.", score:1},
+        {text:"...planą galima keisti, bet tik metų pabaigoje, kad išvengtume chaoso.", score:3},
+        {text:"...keisti reikia tik tada, kai pasiekiami blogi rezultatai.", score:2},
+        {text:"...strateginis planavimas yra nuolatinė mokymosi funkcija – gavus naujų duomenų keisti nedelsiant.", score:5}
+      ]},
+      {text:"Priėmęs svarbų sprendimą, kuris pasirodė sėkmingas, aš...", dim:"Refleksija", options:[
+        {text:"...dokumentuoju sėkmės istoriją ir nustatau, kokios vidinės/išorinės sąlygos turi būti pakartotos kituose projektuose.", score:4},
+        {text:"...tiesiog džiaugiuosi sėkme ir imuosi kito projekto.", score:1},
+        {text:"...išvedu bendrą principą (metareglamentą) ir bandau jį pritaikyti visiškai skirtingose situacijose – tikrinu universalumą.", score:5},
+        {text:"...analizuoju, kurie veiksmai atvedė prie sėkmės.", score:3},
+        {text:"...greitai pasidalinu pamoka apie sėkmę su kolegomis.", score:2}
+      ]}
+    ];
+
+    // --- Dinaminis sugeneravimas ---
+    const quizDiv = document.getElementById('quiz');
+    quizDiv.innerHTML = ""; // švarus startas
+
+    questions.forEach((q, i) => {
+      const card = document.createElement('div');
+      card.className = 'question';
+
+      const title = document.createElement('h3');
+      title.textContent = `${i + 1}. ${q.text}`;
+      card.appendChild(title);
+
+      const dim = document.createElement('div');
+      dim.className = 'dim-tag';
+      dim.textContent = `Dimensija: ${q.dim}`;
+      card.appendChild(dim);
+
+      const opts = document.createElement('div');
+      opts.className = 'options';
+
+      q.options.forEach((opt, j) => {
+        const id = `q${i}_opt${j}`;
+        const label = document.createElement('label');
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = `q${i}`;
+        input.value = String(opt.score);
+        input.id = id;
+
+        label.setAttribute('for', id);
+        label.appendChild(input);
+
+        const txt = document.createTextNode(" " + opt.text);
+        label.appendChild(txt);
+
+        opts.appendChild(label);
+      });
+
+      card.appendChild(opts);
+      quizDiv.appendChild(card);
     });
-    div.appendChild(opts);
-    quizDiv.appendChild(div);
-});
 
-function calculateResults(){
-    let total=0;
-    let dimensions={Sisteminis:0,Perframinimas:0,Refleksija:0};
-    let counts={Sisteminis:0,Perframinimas:0,Refleksija:0};
-
-    questions.forEach((q,i)=>{
-        const val=document.querySelector(`input[name="q${i}"]:checked`);
-        if(val){
-            total+=parseInt(val.value);
-            dimensions[q.dim]+=parseInt(val.value);
-            counts[q.dim]++;
-        }
-    });
-
-    let html=`<h2>Bendras rezultatas: ${total}</h2>`;
-    for(let d in dimensions){
-        let avg=(dimensions[d]/counts[d]).toFixed(2);
-        html+=`<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAIAdvice(avg)}</div>`;
+    // --- Skaičiavimas ---
+    function getAIAdvice(avg) {
+      const score = Number(avg);
+      if (score >= 4.5) return "Puikus strateginis mąstymas – tęskite!";
+      if (score >= 3.5) return "Gerai, bet galima gilinti analizę ir scenarijus.";
+      if (score >= 2.5) return "Vidutiniškai – stiprinkite perframinimą ir sistemos matymą.";
+      return "Reikia kryptingo tobulinimo: pradėkite nuo refleksijos ir prielaidų analizės.";
     }
-    document.getElementById('result').innerHTML=html;
-}
 
-function getAIAdvice(score){
-    if(score>=4.5) return "Puikus strateginis mąstymas – tęskite!";
-    if(score>=3.5) return "Gerai, bet galite dar labiau gilinti analizę.";
-    if(score>=2.5) return "Vidutiniškai – rekomenduojama lavinti kritinį požiūrį.";
-    return "Reikia stipriai tobulinti strateginį mąstymą.";
-}
+    function calculateResults() {
+      let total = 0;
+      const dims = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
+      const counts = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
 
-function downloadPDF(){
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text("Strateginio Mąstymo Testo Rezultatai",10,10);
-    doc.text(document.getElementById('result').innerText,10,20);
-    doc.save("Strateginis_Mastymas_Rezultatai.pdf");
-}
+      questions.forEach((q, i) => {
+        const checked = document.querySelector(`input[name="q${i}"]:checked`);
+        if (checked) {
+          const val = Number(checked.value);
+          total += val;
+          dims[q.dim] += val;
+          counts[q.dim] += 1;
+        }
+      });
+
+      const maxTotal = questions.length * 5;
+      let out = `Bendras rezultatas: ${total} iš ${maxTotal}\n`;
+
+      Object.keys(dims).forEach(d => {
+        const avg = counts[d] ? (dims[d] / counts[d]).toFixed(2) : "0.00";
+        out += `\n${d}: ${avg} / 5\n${getAIAdvice(avg)}\n`;
+      });
+
+      // gražesnis HTML pateikimas
+      const resDiv = document.getElementById('result');
+      resDiv.innerHTML = `<h2>Bendras rezultatas: ${total} / ${maxTotal}</h2>` +
+        Object.keys(dims).map(d => {
+          const avg = counts[d] ? (dims[d] / counts[d]).toFixed(2) : "0.00";
+          return `<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAIAdvice(avg)}</div>`;
+        }).join("");
+    }
+
+    document.getElementById('calcBtn').addEventListener('click', calculateResults);
+
+    // --- PDF ---
+    function downloadPDF() {
+      const resDiv = document.getElementById('result');
+      if (!resDiv.innerText.trim()) {
+        // jei dar neapskaičiuota
+        calculateResults();
+      }
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        const r = document.getElementById('result');
+        r.classList.add('error');
+        r.innerText = "Nepavyko įkelti jsPDF bibliotekos. Patikrinkite interneto ryšį arba CDN.";
+        return;
+      }
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+      let y = margin;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text("Strateginio Mąstymo Testo Rezultatai", margin, y);
+      y += 24;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+
+      // Paimame tekstą be HTML
+      const lines = doc.splitTextToSize(resDiv.innerText, 515);
+      lines.forEach(line => {
+        doc.text(line, margin, y);
+        y += 18;
+      });
+
+      doc.save("Strateginis_Mastymas_Rezultatai.pdf");
+    }
+
+    document.getElementById('pdfBtn').addEventListener('click', downloadPDF);
+
+  } catch (e) {
+    const quizDiv = document.getElementById('quiz');
+    quizDiv.innerHTML = `<div class="question error"><strong>Klaida generuojant klausimus:</strong><br>${e.message}</div>`;
+    console.error("Klausimų generavimo klaida:", e);
+  }
+});
 </script>
 </body>
-</html>
