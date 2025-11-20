@@ -8,16 +8,20 @@
     body { background-color: #121212; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .container { max-width: 900px; margin: auto; padding: 20px; }
     h1, h2 { text-align: center; }
+    .progress-bar { width: 100%; background: #333; border-radius: 5px; margin-bottom: 20px; }
+    .progress { height: 20px; background: #6200ea; width: 0%; border-radius: 5px; transition: width 0.3s; }
     .question { margin-bottom: 20px; padding: 15px; background: #1e1e1e; border-radius: 8px; }
     .answers button { display: block; width: 100%; margin: 5px 0; padding: 10px; background: #333; color: #fff; border: none; border-radius: 5px; text-align: left; }
     .answers button.selected { background: #6200ea; }
     #submit-btn { width: 100%; padding: 15px; margin-top: 20px; background: #6200ea; color: #fff; border: none; border-radius: 5px; font-size: 18px; }
     #result { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-top: 20px; }
+    .hidden { display: none; }
 </style>
 </head>
 <body>
 <div class="container">
     <h1>Strateginio Mąstymo Testas</h1>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
     <form id="quiz-form"></form>
     <button id="submit-btn">Pateikti atsakymus</button>
     <div id="result" class="hidden">
@@ -27,9 +31,9 @@
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdfml2pdf.bundle.min.js</script>
+<script/cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js</script>
 <script>
-// Klausimai iš dokumento
+// VISI 15 klausimų su atsakymais
 const questions = [
     // I. Sisteminis mąstymas
     { text: "1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...", dim: "Sisteminis", answers: [
@@ -67,6 +71,7 @@ const questions = [
         { text: "Rizikoms ir galimybėms (vidiniai/išoriniai)...", score: 4 },
         { text: "Konkurenciniam pranašumui artimiausiu metu...", score: 3 }
     ]},
+
     // II. Perframinimas
     { text: "6. Komandai nepavykstant įveikti kliūties, aš...", dim: "Perframinimas", answers: [
         { text: "Liepiu sustabdyti veiklą ir sugalvoti 5 naujus būdus...", score: 4 },
@@ -103,6 +108,7 @@ const questions = [
         { text: "Leisti generuoti laisvai, bet pasirinkti akivaizdų variantą...", score: 3 },
         { text: "Skatinti idėjas, prieštaraujančias strategijai...", score: 4 }
     ]},
+
     // III. Refleksija
     { text: "11. Po didelės sėkmės/nesėkmės, aš...", dim: "Refleksija", answers: [
         { text: "Naudoju rezultatus strateginiam dienoraščiui...", score: 5 },
@@ -149,7 +155,7 @@ questions.forEach((q) => {
     div.innerHTML = `<p>${q.text}</p>`;
     const answersDiv = document.createElement('div');
     answersDiv.className = 'answers';
-    q.answers.forEach((a) => {
+    q.answers.forEach(a => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = a.text;
@@ -157,12 +163,21 @@ questions.forEach((q) => {
             Array.from(answersDiv.children).forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             btn.dataset.score = a.score;
+            updateProgress();
         };
         answersDiv.appendChild(btn);
     });
     div.appendChild(answersDiv);
     form.appendChild(div);
 });
+
+// Progreso juosta
+function updateProgress() {
+    const selectedCount = document.querySelectorAll('.selected').length;
+    const progress = document.getElementById('progress');
+    const percent = (selectedCount / questions.length) * 100;
+    progress.style.width = percent + '%';
+}
 
 // Rezultatų skaičiavimas
 document.getElementById('submit-btn').onclick = () => {
@@ -193,3 +208,4 @@ document.getElementById('download-pdf').onclick = () => {
 };
 </script>
 </body>
+</html>
