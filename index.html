@@ -216,13 +216,90 @@ function calculateResults() {
   }
   document.getElementById('result').innerHTML = html;
 }
-function getAdvice(score){
-  score=parseFloat(score);
-  if(score>=4.5)return"Puikus strateginis mąstymas – tęskite!";
-  if(score>=3.5)return"Gerai, bet galite dar labiau gilinti analizę.";
-  if(score>=2.5)return"Vidutiniškai – rekomenduojama lavinti kritinį požiūrį.";
-  return"Reikia stipriai tobulinti strateginį mąstymą.";
+
+
+// Funkcija, kuri grąžina patarimus pagal balą
+function getAdvice(dimension, score) {
+  if (dimension === 'system') {
+    if (score < 3) {
+      return `
+        <strong>Sisteminis mąstymas:</strong><br>
+        - Pradėkite nuo paprastų analizės įrankių (5 Kodėl).<br>
+        - Įtraukite duomenis į sprendimų priėmimą.<br>
+        - Mokykitės priežasties-pasekmės ryšių.
+      `;
+    } else if (score < 4) {
+      return `
+        <strong>Sisteminis mąstymas:</strong><br>
+        - Gilinkite analizę naudodami Ishikawa diagramas.<br>
+        - Kartą per savaitę peržiūrėkite sprendimus ir ieškokite sisteminių priežasčių.<br>
+        - Įtraukite KPI stebėseną.
+      `;
+    } else {
+      return `
+        <strong>Sisteminis mąstymas:</strong><br>
+        - Išlaikykite aukštą lygį, dalinkitės metodais su komanda.<br>
+        - Kurkite mokymų medžiagą apie sisteminį požiūrį.<br>
+        - Mentoruokite kitus.
+      `;
+    }
+  }
+
+  if (dimension === 'perform') {
+    if (score < 3) {
+      return `
+        <strong>Performinimas (kritinis požiūris):</strong><br>
+        - Prieš sprendimą sukurkite bent 2–3 alternatyvas.<br>
+        - Naudokite „Raudonos komandos“ metodą.<br>
+        - Įtraukite scenarijų analizę (geriausias/blogiausias).
+      `;
+    } else if (score < 4) {
+      return `
+        <strong>Performinimas:</strong><br>
+        - Lavinkite kritinį požiūrį per diskusijas.<br>
+        - Įtraukite SWOT analizę į projektus.<br>
+        - Vertinkite rizikas prieš sprendimus.
+      `;
+    } else {
+      return `
+        <strong>Performinimas:</strong><br>
+        - Išlaikykite aukštą lygį, dalinkitės patirtimi.<br>
+        - Kurkite „kritinio mąstymo“ dirbtuves.<br>
+        - Mentoruokite kolegas.
+      `;
+    }
+  }
+
+  if (dimension === 'reflect') {
+    if (score < 3) {
+      return `
+        <strong>Refleksija:</strong><br>
+        - Po kiekvieno projekto atlikite AAR.<br>
+        - Dokumentuokite pamokas.<br>
+        - Dalinkitės su komanda.
+      `;
+    } else if (score < 4) {
+      return `
+        <strong>Refleksija:</strong><br>
+        - Gilinkite analizę po sėkmių ir nesėkmių.<br>
+        - Įtraukite pamokas į procesų tobulinimą.<br>
+        - Kurkite „pamokų duomenų bazę“.
+      `;
+    } else {
+      return `
+        <strong>Refleksija:</strong><br>
+        - Išlaikykite aukštą lygį, dalinkitės gerąja praktika.<br>
+        - Mentoruokite kitus refleksijos metodais.<br>
+        - Kurkite kultūrą, kurioje refleksija yra norma.
+      `;
+    }
+  }
 }
+
+// Įrašome patarimus į HTML
+document.getElementById('system-advice').innerHTML = getAdvice('system', systemScore);
+document.getElementById('perform-advice').innerHTML = getAdvice('perform', performScore);
+document.getElementById('reflect-advice').innerHTML = getAdvice('reflect', reflectScore);
 function downloadPDF(){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF();
