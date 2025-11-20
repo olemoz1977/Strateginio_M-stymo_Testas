@@ -182,24 +182,39 @@
 
 https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
 <script>
-function calculateResults(){
-  let total=0;
-  const dims={Sisteminis:0,Perframinimas:0,Refleksija:0};
-  const counts={Sisteminis:0,Perframinimas:0,Refleksija:0};
-  document.querySelectorAll('input[type=radio]:checked').forEach(el=>{
-    const val=parseInt(el.value);
-    const dim=el.dataset.dim;
-    total+=val;
-    dims[dim]+=val;
+function calculateResults() {
+  const totalQuestions = document.querySelectorAll('.question').length;
+  let answeredCount = 0;
+
+  document.querySelectorAll('input[type=radio]:checked').forEach(() => {
+    answeredCount++;
+  });
+
+  if (answeredCount < totalQuestions) {
+    alert(`Neatsakyti ${totalQuestions - answeredCount} klausimai. Prašome atsakyti į visus klausimus prieš skaičiuojant rezultatą.`);
+    return; // sustabdyti funkciją
+  }
+
+  // Jei visi atsakyti – skaičiuojame rezultatą
+  let total = 0;
+  const dims = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
+  const counts = { Sisteminis: 0, Perframinimas: 0, Refleksija: 0 };
+
+  document.querySelectorAll('input[type=radio]:checked').forEach(el => {
+    const val = parseInt(el.value);
+    const dim = el.dataset.dim;
+    total += val;
+    dims[dim] += val;
     counts[dim]++;
   });
-  const maxTotal=document.querySelectorAll('.question').length*5;
-  let html=`<h2>Bendras rezultatas: ${total} / ${maxTotal}</h2>`;
-  for(let d in dims){
-    const avg=(counts[d]?dims[d]/counts[d]:0).toFixed(2);
-    html+=`<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAdvice(avg)}</div>`;
+
+  const maxTotal = totalQuestions * 5;
+  let html = `<h2>Bendras rezultatas: ${total} / ${maxTotal}</h2>`;
+  for (let d in dims) {
+    const avg = (counts[d] ? dims[d] / counts[d] : 0).toFixed(2);
+    html += `<div class="dimension"><strong>${d}:</strong> ${avg} / 5<br>${getAdvice(avg)}</div>`;
   }
-  document.getElementById('result').innerHTML=html;
+  document.getElementById('result').innerHTML = html;
 }
 function getAdvice(score){
   score=parseFloat(score);
