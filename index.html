@@ -175,13 +175,14 @@
 <label><input type="radio" name="q15" value="2" data-dim="Refleksija"> Pasidalinu pamoka su kolegomis</label>
 </div>
 
+
 </form>
 
 <button onclick="calculateResults()">Gauti rezultatą</button>
 <div id="result"></div>
 <button onclick="downloadPDF()">Atsisiųsti PDF</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jpdf.umd.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jsp</script>
 <script>
 function calculateResults() {
   const totalQuestions = document.querySelectorAll('.question').length;
