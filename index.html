@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strateginio mąstymo testas</title>
-<link href="https://fonts.googleapismily=Roboto:wght@400;700&display=swap
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700p
 <style>
     body {
         font-family: 'Roboto', sans-serif;
@@ -25,7 +25,7 @@
     }
     .options label {
         margin-right: 15px;
-       -block;
+        display: inline-block;
     }
     button {
         background: #0078d7;
@@ -53,9 +53,11 @@
 <button onclick="generatePDF()">Generuoti PDF</button>
 <div id="result"></div>
 
-https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
-<script src="httpsdflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js</script>
-https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js</script>
+<!-- ✅ Teisingos CDN nuorodos -->
+<script src="https://cdnjs.cloudflare.com/ajax/libsjspdf.umd.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs1.4.1/html2canvas.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotablept>
+
 <script>
 const questions = [
     {text: "1. Dažnai kuriu ilgalaikę viziją ir planus.", dim: "Vizija"},
@@ -108,7 +110,7 @@ function calculateResult() {
     localStorage.setItem('strategyResult', JSON.stringify({avg, dimScores}));
 }
 
-async function generatePDF() {
+function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const data = JSON.parse(localStorage.getItem('strategyResult'));
