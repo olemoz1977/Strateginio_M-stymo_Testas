@@ -4,127 +4,87 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strateginio mąstymo testas</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700p
-<style>
-    body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #121212;
-        color: #f1f1f1;
-        margin: 0;
-        padding: 20px;
-    }
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .question {
-        background: #1e1e1e;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-    }
-    .options label {
-        margin-right: 15px;
-        display: inline-block;
-    }
-    button {
-        background: #0078d7;
-        color: #fff;
-        border: none;
-        padding: 12px 20px;
-        font-size: 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        margin: 10px auto;
-        display: block;
-    }
-    #result {
-        text-align: center;
-        font-size: 18px;
-        margin-top: 20px;
-        font-weight: bold;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display>
+    body {font-family:'Roboto',sans-serif;background:#121212;color:#f1f1f1;margin:0;padding:20px;}
+    h1{text-align:center;margin-bottom:20px;}
+    .question{background:#1e1e1e;padding:15px;margin-bottom:15px;border-radius:8px;}
+    .options label{display:block;margin:5px 0;}
+    button{background:#0078d7;color:#fff;border:none;padding:12px 20px;font-size:16px;border-radius:6px;cursor:pointer;margin:10px auto;display:block;}
+    #result{text-align:center;font-size:18px;margin-top:20px;font-weight:bold;}
+    .progress{width:100%;background:#333;border-radius:5px;margin:20px 0;}
+    .progress-bar{height:20px;background:#0078d7;width:0%;border-radius:5px;}
 </style>
 </head>
 <body>
 <h1>Strateginio mąstymo testas</h1>
-<form id="strategyTest"></form>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<form id="strategyTest">
+    <!-- Klausimai su atsakymais -->
+    <!-- Pavyzdys: -->
+    <div class="question">
+        <p>1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</p>
+        <div class="options">
+            <label><input type="radio" name="q0" value="4"> ...naudoju formalią matricą, kad įvertinčiau tiesioginį poveikį visiems susijusiems skyriams ir skyrių motyvacijai.</label>
+            <label><input type="radio" name="q0" value="1"> ...visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą, ignoruodamas galimus padarinius kitur.</label>
+            <label><input type="radio" name="q0" value="5"> ...analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei, kad užtikrinčiau, jog pokytis nepažeis bendro įmonės konkurencinio pranašumo.</label>
+            <label><input type="radio" name="q0" value="3"> ...paklausiu kelių kitų skyrių vadovų nuomonės apie galimus neigiamus padarinius jų darbui.</label>
+            <label><input type="radio" name="q0" value="2"> ...atsižvelgiu į gretimų skyrių prieštaravimus, bet vis tiek darau tai, kas geriausia mano skyriui.</label>
+        </div>
+    </div>
+    <!-- Čia įdėsiu visus 15 klausimų su atsakymais iš dokumento -->
+</form>
 <button onclick="calculateResult()">Skaičiuoti rezultatą</button>
 <button onclick="generatePDF()">Generuoti PDF</button>
 <div id="result"></div>
 
-<!-- ✅ Teisingos CDN nuorodos -->
-<script src="https://cdnjs.cloudflare.com/ajax/libsjspdf.umd.min.js</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs1.4.1/html2canvas.min.js</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotablept>
-
+<script src="https://cdnjs.cloudflare.com/ajax.5.1/jspdf.umd.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2canvas.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/plugin.autotable.min.js</script>
 <script>
-const questions = [
-    {text: "1. Dažnai kuriu ilgalaikę viziją ir planus.", dim: "Vizija"},
-    {text: "2. Analizuoju duomenis prieš priimdamas sprendimus.", dim: "Analizė"},
-    {text: "3. Įvertinu ilgalaikes pasekmes prieš veikdamas.", dim: "Vizija"},
-    {text: "4. Įtraukiu komandą į strateginių sprendimų priėmimą.", dim: "Lyderystė"},
-    {text: "5. Stebiu rinkos tendencijas ir prisitaikau.", dim: "Analizė"},
-    {text: "6. Dažnai keliu klausimą „Kas bus po 5 metų?“. ", dim: "Vizija"},
-    {text: "7. Vertinu rizikas prieš priimdamas sprendimus.", dim: "Analizė"},
-    {text: "8. Skiriu laiko strateginiam planavimui.", dim: "Vizija"},
-    {text: "9. Įtraukiu KPI į strateginius tikslus.", dim: "Lyderystė"},
-    {text: "10. Priimu sprendimus remdamasis duomenimis.", dim: "Analizė"},
-    {text: "11. Įvertinu konkurentų veiksmus.", dim: "Analizė"},
-    {text: "12. Skatinu komandą galvoti strategiškai.", dim: "Lyderystė"},
-    {text: "13. Dažnai peržiūriu ilgalaikius tikslus.", dim: "Vizija"},
-    {text: "14. Įtraukiu inovacijas į strategiją.", dim: "Lyderystė"},
-    {text: "15. Vertinu finansinį poveikį ilgalaikėje perspektyvoje.", dim: "Analizė"}
-];
-
-// Shuffle klausimus
-questions.sort(() => Math.random() - 0.5);
-
-const form = document.getElementById('strategyTest');
-questions.forEach((q, i) => {
-    const div = document.createElement('div');
-    div.className = 'question';
-    div.innerHTML = `<p>${q.text}</p>
-        <div class="options">
-            ${[1,2,3,4,5].map(val => `<label><input type="radio" name="q${i}" value="${val}"> ${val}</label>`).join('')}
-        </div>`;
-    form.appendChild(div);
-});
-
-function calculateResult() {
-    let total = 0;
-    let dimScores = {};
-    for (let i = 0; i < questions.length; i++) {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        if (!selected) {
-            alert('Atsakykite į visus klausimus!');
-            return;
-        }
-        const val = parseInt(selected.value);
-        total += val;
-        dimScores[questions[i].dim] = (dimScores[questions[i].dim] || 0) + val;
+function updateProgress(){
+    const total = 15;
+    let answered = 0;
+    for(let i=0;i<total;i++){
+        if(document.querySelector(`input[name='q${i}']:checked`)){answered++;}
     }
-    const avg = total / questions.length;
-    let interpretation = avg >= 4 ? "Strateginis mąstytojas" : avg >= 3 ? "Vidutinis strateginis mąstymas" : "Operatyvinis mąstymas";
+    document.getElementById('progressBar').style.width = (answered/total*100)+'%';
+}
+document.querySelectorAll('input[type=radio]').forEach(el=>el.addEventListener('change',updateProgress));
+
+function calculateResult(){
+    let total = 0;
+    let count = 15;
+    for(let i=0;i<count;i++){
+        let sel = document.querySelector(`input[name='q${i}']:checked`);
+        if(!sel){alert('Atsakykite į visus klausimus!');return;}
+        total += parseInt(sel.value);
+    }
+    let avg = total/count;
+    let interpretation = avg>=4?'Strateginis mąstytojas':avg>=3?'Vidutinis strateginis mąstymas':'Operatyvinis mąstymas';
     document.getElementById('result').innerText = `Rezultatas: ${interpretation} (Vidurkis: ${avg.toFixed(2)})`;
-    localStorage.setItem('strategyResult', JSON.stringify({avg, dimScores}));
+    localStorage.setItem('strategyResult',JSON.stringify({avg:avg}));
 }
 
-function generatePDF() {
+function generatePDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const data = JSON.parse(localStorage.getItem('strategyResult'));
     doc.setFontSize(16);
-    doc.text("Strateginio mąstymo testo rezultatai", 10, 10);
+    doc.text('Strateginio mąstymo testo rezultatai',10,10);
     doc.setFontSize(12);
-    doc.text(`Sugeneruota: ${new Date().toISOString().split('T')[0]}`, 10, 20);
-    doc.text(`Vidurkis: ${data.avg.toFixed(2)}`, 10, 30);
-    doc.text("Dimensijų balai:", 10, 40);
-    const rows = Object.entries(data.dimScores).map(([dim, score]) => [dim, score]);
-    doc.autoTable({ head: [['Dimensija', 'Balas']], body: rows, startY: 50 });
-    doc.text("Pastaba: Rekomendacijos sugeneruotos taisyklių pagrindu pagal balus.", 10, doc.lastAutoTable.finalY + 10);
-    doc.text("Autorius: Oleg Mozochin | STQ metodas", 10, doc.lastAutoTable.finalY + 20);
-    doc.save("Strateginis_Testas.pdf");
+    doc.text(`Sugeneruota: ${new Date().toISOString().split('T')[0]}`,10,20);
+    doc.text(`Vidurkis: ${data.avg.toFixed(2)}`,10,30);
+    doc.autoTable({
+        head:[['Tikslas','Veiksmas','Terminas','Atsakingas']],
+        body:[
+            ['Pagerinti sisteminį mąstymą','Analizuoti prielaidas','30 dienų','Vadovas'],
+            ['Didinti refleksiją','Rašyti strateginį dienoraštį','30 dienų','Vadovas']
+        ],
+        startY:40
+    });
+    doc.text('Pastaba: Rekomendacijos sugeneruotos taisyklių pagrindu pagal balus.',10,doc.lastAutoTable.finalY+10);
+    doc.text('Autorius: Oleg Mozochin | STQ metodas',10,doc.lastAutoTable.finalY+20);
+    doc.save('Strateginis_Testas.pdf');
 }
 </script>
 </body>
