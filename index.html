@@ -19,78 +19,196 @@
   .advice-list { margin: 6px 0 0 18px; }
   .advice-list li { margin: 2px 0; }
   .note { font-size: 13px; opacity:.8; }
-  button { background: var(--blue); color:#fff; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+  .buttons { display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px; }
+  button { background: var(--blue); color:#fff; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; }
   button[disabled] { opacity: .6; cursor: not-allowed; }
   #result { margin-top: 16px; }
+  .muted { opacity:.8; font-size: 13px; }
 </style>
 </head>
 <body>
 
 <h1>Strateginio mąstymo testas</h1>
+<div class="muted">Atsakymai išsaugomi automatiškai šiame įrenginyje (localStorage). Galite saugiai perkrauti puslapį.</div>
 
-<form id="testForm">
-  <!-- Q1 – SISTEMINIS -->
-  <div class="question">
-    <p>1. Mano požiūris į strategiją...</p>
-    <label><input type="radio" name="q1" value="5" data-dim="sisteminis"> Strategija yra nuolatinė funkcija</label><br>
-    <label><input type="radio" name="q1" value="3" data-dim="sisteminis"> Keisti tik esant blogiems rezultatams</label>
-  </div>
+<form id="testForm"></form>
 
-  <!-- Q2 – PERFORMINIMAS -->
-  <div class="question">
-    <p>2. Prieš priimdamas sprendimą, vertinu alternatyvas...</p>
-    <label><input type="radio" name="q2" value="5" data-dim="performinimas"> Visada, bent 2–3 alternatyvas</label><br>
-    <label><input type="radio" name="q2" value="3" data-dim="performinimas"> Kartais, kai yra laiko</label><br>
-    <label><input type="radio" name="q2" value="1" data-dim="performinimas"> Retai / beveik niekada</label>
-  </div>
-
-  <!-- Q3 – REFLEKSIJA -->
-  <div class="question">
-    <p>3. Po svarbaus sprendimo...</p>
-    <label><input type="radio" name="q3" value="5" data-dim="refleksija"> Atlieku AAR ir fiksuoju pamokas</label><br>
-    <label><input type="radio" name="q3" value="3" data-dim="refleksija"> Aptariame neformaliai</label><br>
-    <label><input type="radio" name="q3" value="1" data-dim="refleksija"> Tiesiog einu prie kito darbo</label>
-  </div>
-
-  <!-- ... jūsų likę klausimai su teisingu data-dim ... -->
-</form>
-
-<!-- TIPAS PRIVALOMAS: kad formos „submit“ neperkrautų puslapio -->
-<button id="btnCalc" type="button" onclick="calculateResults()" disabled>Gauti rezultatą</button>
-<button id="btnPDF"  type="button" onclick="downloadPDF()" disabled>Atsisiųsti PDF</button>
+<div class="buttons">
+  <button id="btnCalc" type="button" onclick="calculateResults()" disabled>Gauti rezultatą</button>
+  <button id="btnPDF"  type="button" onclick="downloadPDF()" disabled>Atsisiųsti PDF</button>
+  <button id="btnClear" type="button" onclick="clearAnswers()">Išvalyti atsakymus</button>
+</div>
 
 <div id="result"></div>
 
-<!-- Teisingi CDN (tvarkinga nuoroda į jspdf + html2canvas) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.jsript src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min
+<!-- Teisingi CDN -->
+https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
+https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js</script>
+
 <script>
-/* ======= Mygtukų valdymas ======= */
-function getQuestionNames() {
-  const names = new Set();
-  document.querySelectorAll('.question input[type="radio"]').forEach(el => names.add(el.name));
-  return Array.from(names);
+/* ======================= KONFIGŪRA ======================= */
+// 15 klausimų: po 5 kiekvienai dimensijai. Reikšmės: didesnės – geriau (1–5).
+const QUESTIONS = [
+  // SISTEMINIS
+  { id:'q1', dim:'sisteminis', text:'Mano požiūris į strategiją...', options:[
+    {label:'Strategija yra nuolatinė funkcija', value:5},
+    {label:'Keisti tik esant blogiems rezultatams', value:3},
+    {label:'Strategija nėra mano darbas', value:1},
+  ]},
+  { id:'q2', dim:'sisteminis', text:'Priežasties–pasekmės ryšius analizuoju...', options:[
+    {label:'Sistemingai, naudoju įrankius (5 Kodėl, Ishikawa)', value:5},
+    {label:'Kai kada, jei matau poreikį', value:3},
+    {label:'Retai / beveik niekada', value:1},
+  ]},
+  { id:'q3', dim:'sisteminis', text:'KPI prieš / po sprendimo peržiūriu...', options:[
+    {label:'Visada, sprendimai remiasi duomenimis', value:5},
+    {label:'Kartais, kai yra laiko', value:3},
+    {label:'Beveik niekada', value:1},
+  ]},
+  { id:'q4', dim:'sisteminis', text:'Sprendžiant problemą, vertinu sistemos dalis ir sąsajas...', options:[
+    {label:'Taip, žiūriu per visos sistemos prizmę', value:5},
+    {label:'Iš dalies, dažniau lokaliai', value:3},
+    {label:'Ne, sprendžiu tik vietoje', value:1},
+  ]},
+  { id:'q5', dim:'sisteminis', text:'Standartizuoju sprendimus (procesai, šablonai, instrukcijos)...', options:[
+    {label:'Taip, kuriu ir atnaujinu', value:5},
+    {label:'Kartais, jei būtina', value:3},
+    {label:'Ne', value:1},
+  ]},
+
+  // PERFORMINIMAS
+  { id:'q6', dim:'performinimas', text:'Prieš sprendimą visada turiu alternatyvas...', options:[
+    {label:'Taip, ≥2 realios alternatyvos', value:5},
+    {label:'Kartais turiu bent 1', value:3},
+    {label:'Dažniausiai neturiu', value:1},
+  ]},
+  { id:'q7', dim:'performinimas', text:'Naudoju „Raudonos komandos“ arba kritikos sesijas...', options:[
+    {label:'Reguliariai, prieš svarbius sprendimus', value:5},
+    {label:'Kartais', value:3},
+    {label:'Nenaudoju', value:1},
+  ]},
+  { id:'q8', dim:'performinimas', text:'Rizikas ir scenarijus (geriausias/blogiausias/realus) vertinu...', options:[
+    {label:'Visada, tai dalis sprendimo', value:5},
+    {label:'Kai prisimenu', value:3},
+    {label:'Beveik niekada', value:1},
+  ]},
+  { id:'q9', dim:'performinimas', text:'Naudoju SWOT / alternatyvų palyginimo lentelę...', options:[
+    {label:'Dažnai, tai standartas', value:5},
+    {label:'Kartais', value:3},
+    {label:'Nenaudoju', value:1},
+  ]},
+  { id:'q10', dim:'performinimas', text:'Sprendimą patikrinu su suinteresuotais (stakeholders)...', options:[
+    {label:'Taip, planingai', value:5},
+    {label:'Retkarčiais', value:3},
+    {label:'Nedažnai', value:1},
+  ]},
+
+  // REFLEKSIJA
+  { id:'q11', dim:'refleksija', text:'Po svarbių sprendimų atlikiu AAR (After Action Review)...', options:[
+    {label:'Taip, fiksuoju pamokas', value:5},
+    {label:'Aptariam neformaliai', value:3},
+    {label:'Ne, einu prie kito darbo', value:1},
+  ]},
+  { id:'q12', dim:'refleksija', text:'Pamokas (Lessons Learned) kaupiu ir dalinuosi...', options:[
+    {label:'Taip, yra sistema / biblioteka', value:5},
+    {label:'Kartais, per susirinkimus', value:3},
+    {label:'Retai / nėra sistemos', value:1},
+  ]},
+  { id:'q13', dim:'refleksija', text:'Pritaikau pamokas kituose projektuose...', options:[
+    {label:'Sistemingai, su seka ir KPI', value:5},
+    {label:'Kai prisimenu', value:3},
+    {label:'Beveik niekada', value:1},
+  ]},
+  { id:'q14', dim:'refleksija', text:'Dokumentuoju sėkmes ir nesėkmes su konkrečiais pavyzdžiais...', options:[
+    {label:'Taip, trumpai ir aiškiai', value:5},
+    {label:'Kartais', value:3},
+    {label:'Retai', value:1},
+  ]},
+  { id:'q15', dim:'refleksija', text:'Komandoje skatinama refleksijos kultūra...', options:[
+    {label:'Taip, rodau pavyzdį', value:5},
+    {label:'Iš dalies', value:3},
+    {label:'Kol kas – ne', value:1},
+  ]},
+];
+
+// kur saugosime atsakymus
+const LS_KEY = 'strateginis_testas_v1_answers';
+
+/* ======================= RENDERIS ======================= */
+function renderQuestions() {
+  const saved = loadAnswers();
+  const form = document.getElementById('testForm');
+  form.innerHTML = ''; // nuo nulio
+
+  QUESTIONS.forEach((q, idx) => {
+    const block = document.createElement('div');
+    block.className = 'question';
+    block.innerHTML = `<p>${idx+1}. ${q.text}</p>`;
+
+    q.options.forEach((opt, i) => {
+      const id = `${q.id}_o${i+1}`;
+      const checked = saved[q.id] == opt.value ? 'checked' : '';
+      block.insertAdjacentHTML('beforeend', `
+        <label for="${id}">
+          <input id="${id}" type="radio" name="${q.id}" value="${opt.value}" data-dim="${q.dim}" ${checked}>
+          ${opt.label}
+        </label><br>
+      `);
+    });
+
+    form.appendChild(block);
+  });
 }
+
+/* ======================= SAUGOJIMAS ======================= */
+function loadAnswers() {
+  try {
+    const j = localStorage.getItem(LS_KEY);
+    return j ? JSON.parse(j) : {};
+  } catch(e) { return {}; }
+}
+
+function saveAnswers() {
+  const answers = {};
+  QUESTIONS.forEach(q => {
+    const sel = document.querySelector(`input[name="${q.id}"]:checked`);
+    if (sel) answers[q.id] = parseInt(sel.value,10);
+  });
+  localStorage.setItem(LS_KEY, JSON.stringify(answers));
+}
+
+function clearAnswers() {
+  localStorage.removeItem(LS_KEY);
+  renderQuestions();
+  attachListeners();
+  updateButtons();
+  document.getElementById('result').innerHTML = '';
+}
+
+/* ======================= BŪSENA / MYGTUKAI ======================= */
+function getQuestionNames() { return QUESTIONS.map(q => q.id); }
 function allAnswered() {
-  const names = getQuestionNames();
-  return names.every(n => document.querySelector(`input[name="${n}"]:checked`));
+  return getQuestionNames().every(n => document.querySelector(`input[name="${n}"]:checked`));
 }
 function updateButtons() {
-  const calcBtn = document.getElementById('btnCalc');
-  const pdfBtn  = document.getElementById('btnPDF');
-  calcBtn.disabled = !allAnswered();
-  pdfBtn.disabled  = document.getElementById('result').innerText.trim().length === 0;
+  document.getElementById('btnCalc').disabled = !allAnswered();
+  document.getElementById('btnPDF').disabled  = document.getElementById('result').innerText.trim().length === 0;
 }
-document.addEventListener('change', (e) => {
-  if (e.target.matches('.question input[type="radio"]')) updateButtons();
-});
-document.addEventListener('DOMContentLoaded', updateButtons);
 
-/* ======= Skaičiavimas ======= */
+/* klausykime pasikeitimų */
+function attachListeners() {
+  document.querySelectorAll('#testForm input[type="radio"]').forEach(el => {
+    el.addEventListener('change', () => {
+      saveAnswers();
+      updateButtons();
+    });
+  });
+}
+
+/* ======================= SKAIČIAVIMAS ======================= */
 function calculateResults() {
   if (!allAnswered()) {
-    const names = getQuestionNames();
-    const missing = names.filter(n => !document.querySelector(`input[name="${n}"]:checked`));
-    alert(`Neatsakyti ${missing.length} klausimai. Prašome atsakyti į visus.`);
+    alert('Ne visi klausimai atsakyti. Užpildykite viską.');
     return;
   }
 
@@ -98,38 +216,41 @@ function calculateResults() {
   const dims   = { sisteminis: 0, performinimas: 0, refleksija: 0 };
   const counts = { sisteminis: 0, performinimas: 0, refleksija: 0 };
 
-  document.querySelectorAll('.question input[type="radio"]:checked').forEach(el => {
-    const val = parseInt(el.value, 10) || 0;
-    const dim = (el.dataset.dim || '').toLowerCase();
-    if (!dims.hasOwnProperty(dim)) return;
+  QUESTIONS.forEach(q => {
+    const el = document.querySelector(`input[name="${q.id}"]:checked`);
+    const val = parseInt(el.value,10) || 0;
     total += val;
-    dims[dim] += val;
-    counts[dim]++;
+    dims[q.dim] += val;
+    counts[q.dim]++;
   });
 
-  const totalQuestions = getQuestionNames().length;
+  const totalQuestions = QUESTIONS.length;
   const maxTotal = totalQuestions * 5;
   const pct = ((total / maxTotal) * 100).toFixed(0);
 
   const avg = {
-    sisteminis   : counts.sisteminis   ? (dims.sisteminis   / counts.sisteminis)   : 0,
-    performinimas: counts.performinimas? (dims.performinimas/ counts.performinimas): 0,
-    refleksija   : counts.refleksija   ? (dims.refleksija   / counts.refleksija)   : 0
+    sisteminis   : (dims.sisteminis    / counts.sisteminis).toFixed(2),
+    performinimas: (dims.performinimas / counts.performinimas).toFixed(2),
+    refleksija   : (dims.refleksija    / counts.refleksija).toFixed(2)
   };
 
   let html = `
     <h2>Bendras rezultatas: ${total} / ${maxTotal} <span class="pill">${pct}%</span></h2>
-    ${dimensionBlock('Sisteminis',   avg.sisteminis,   'sisteminis')}
-    ${dimensionBlock('Performinimas',avg.performinimas,'performinimas')}
-    ${dimensionBlock('Refleksija',   avg.refleksija,   'refleksija')}
-    ${aiRecommendations(avg)}
+    ${dimensionBlock('Sisteminis',    parseFloat(avg.sisteminis),    'sisteminis')}
+    ${dimensionBlock('Performinimas', parseFloat(avg.performinimas), 'performinimas')}
+    ${dimensionBlock('Refleksija',    parseFloat(avg.refleksija),    'refleksija')}
+    ${aiRecommendations({
+      sisteminis: parseFloat(avg.sisteminis),
+      performinimas: parseFloat(avg.performinimas),
+      refleksija: parseFloat(avg.refleksija)
+    })}
     <div class="note">Pastaba: rekomendacijos sugeneruotos taisyklių pagrindu pagal balus.</div>
   `;
 
   const resultEl = document.getElementById('result');
   resultEl.innerHTML = html;
 
-  // animuoti bar'ą
+  // animuoti juostas
   requestAnimationFrame(() => {
     document.querySelectorAll('.bar[data-pct]').forEach(b => {
       const p = b.getAttribute('data-pct');
@@ -137,7 +258,7 @@ function calculateResults() {
     });
   });
 
-  updateButtons(); // aktyvuojam PDF
+  updateButtons(); // įjungiam PDF
 }
 
 function dimensionBlock(title, score, key) {
@@ -155,12 +276,12 @@ function dimensionBlock(title, score, key) {
   `;
 }
 
-/* ======= Patarimai ======= */
+/* ======================= PATARIMAI ======================= */
 function list(items) { return `<ul class="advice-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>`; }
 
 function getAdvice(dimension, score) {
   if (dimension === 'sisteminis') {
-    if (score < 3) return list(['„5 Kodėl“ ant kiekvieno nukrypimo','Ishikawa 1 kartą/sav.','Sprendimuose remkitės duomenimis']);
+    if (score < 3) return list(['„5 Kodėl“ kiekvienam nukrypimui','Ishikawa 1×/sav.','Sprendimuose remkitės duomenimis']);
     if (score < 4) return list(['Gilesnė priežasties–pasekmės analizė','Savaitinė sprendimų peržiūra','KPI prieš/po pakeitimų']);
     return list(['Dalinkitės metodais','Mini mokymai komandai','Mentorystė 1–2 kolegoms']);
   }
@@ -180,13 +301,13 @@ function getAdvice(dimension, score) {
 /* ======= „AI“ (taisyklių) rekomendacijos – silpniausia dimensija ======= */
 function aiRecommendations(avg) {
   const entries = [
-    ['Sisteminis',   avg.sisteminis,   'sisteminis'],
-    ['Performinimas',avg.performinimas,'performinimas'],
-    ['Refleksija',   avg.refleksija,   'refleksija']
+    ['Sisteminis',    avg.sisteminis,    'sisteminis'],
+    ['Performinimas', avg.performinimas, 'performinimas'],
+    ['Refleksija',    avg.refleksija,    'refleksija']
   ];
   entries.sort((a,b) => a[1] - b[1]); // mažiausias balas pirmas
-
   const [weakTitle, weakScore, weakKey] = entries[0];
+
   const quickWins = {
     sisteminis   : ['„5 Kodėl“ kiekvienam nukrypimui', 'Ishikawa 1×/sav.'],
     performinimas: ['2+ alternatyvos prieš sprendimą', '„Raudonos komandos“ 15 min. patikra'],
@@ -206,15 +327,13 @@ function aiRecommendations(avg) {
   `;
 }
 
-/* ======= PDF ======= */
+/* ======================= PDF ======================= */
 async function downloadPDF() {
   const resultEl = document.getElementById('result');
   if (!resultEl.innerText.trim()) {
     alert('Pirmiausia apskaičiuokite rezultatą.');
     return;
   }
-
-  // Vaizdas → PDF (diakritika saugi)
   const canvas = await html2canvas(resultEl, { backgroundColor: '#ffffff', scale: 2 });
   const imgData = canvas.toDataURL('image/png');
 
@@ -236,5 +355,13 @@ async function downloadPDF() {
   doc.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
   doc.save('Strateginis_Mastymas_Rezultatai.pdf');
 }
+
+/* ======================= INIT ======================= */
+document.addEventListener('DOMContentLoaded', () => {
+  renderQuestions();
+  attachListeners();
+  updateButtons();
+});
 </script>
 </body>
+</html>
