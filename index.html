@@ -1,11 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="lt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Strateginio mąstymo testas</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display>
+<link href="https://fonts.googleapis.com/css2?family@400;700&display=swap
+<style>
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #121212;
@@ -13,7 +13,71 @@
         margin: 0;
         padding: 20px;
     }
-    /* ... likęs CSS ... */
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #00bcd4;
+    }
+    .question {
+        background: #1e1e1e;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.6s forwards;
+    }
+    @keyframes fadeIn {
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .options label {
+        display: block;
+        margin: 5px 0;
+        cursor: pointer;
+    }
+    button {
+        background: #00bcd4;
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px auto;
+        display: block;
+        width: 90%;
+        max-width: 300px;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background: #0097a7;
+    }
+    #result {
+        text-align: center;
+        font-size: 18px;
+        margin-top: 20px;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 6px;
+    }
+    .progress {
+        width: 100%;
+        background: #333;
+        border-radius: 5px;
+        margin: 20px 0;
+        overflow: hidden;
+    }
+    .progress-bar {
+        height: 20px;
+        background: #00bcd4;
+        width: 0%;
+        transition: width 0.4s ease;
+    }
+    @media (max-width: 600px) {
+        .question { font-size: 14px; }
+        button { font-size: 14px; }
+    }
 </style>
 </head>
 <body>
@@ -34,8 +98,8 @@
 </div>
 </div>
 
-<!-- ✅ Čia įdėk visus likusius klausimus (2–15) iš dokumento su atsakymais ir balais -->
-<!-- (Dėl vietos ribojimo nerodau visų čia, bet struktūra tokia pati kaip pavyzdyje) -->
+<!-- ✅ Čia įdėk likusius klausimus (2–15) iš dokumento su atsakymais ir balais -->
+<!-- Struktūra tokia pati kaip pavyzdyje -->
 
 </form>
 
@@ -43,9 +107,9 @@
 <button onclick="generatePDF()">Generuoti PDF</button>
 <div id="result"></div>
 
-<script/cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
-<script/cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.pluginn.js</script>
+<script src="https://cdnjs.cloudflare.compdf/2.5.1/jspdf.umd.min.js</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/htmls</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-aut/jspdf.plugin.autotable.min.js</script>
 <script>
 function updateProgress(){
     const total = 15;
