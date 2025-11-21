@@ -1,6 +1,6 @@
 # Strateginio Mąstymo Testas
 
-Interaktyvus testas, skirtas įvertinti strateginio mąstymo gebėjimus pagal 3 dimensijas:
+Interaktyvus testas paremtas STQ metodologija, skirtas įvertinti strateginio mąstymo gebėjimus pagal 3 dimensijas:
 - **Sisteminis mąstymas**
 - **Perframinimas**
 - **Refleksija**
@@ -13,11 +13,8 @@ pradek testa https://olemoz1977.github.io/Strateginio_M-stymo_Testas/
 
 ## 🔍 Funkcijos
 - 15 klausimų, suskirstytų į 3 kompetencijų blokus
-- Vienas klausimas per ekraną (mobilui patogus formatas)
-- Progreso rodymas (pvz., „3/15“)
-- Rezultatų analizė pagal kiekvieną dimensiją (Žemas / Vidutinis / Aukštas)
+- Rezultatų analizė pagal kiekvieną dimensiją 
 - PDF atsisiuntimas su rezultatais
 
 ---
 
-## 📂 Projekto struktūra
