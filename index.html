@@ -362,59 +362,148 @@
   </section>
 </div>
 
-<script>
-const form=document.getElementById('stqForm');
-const errorEl=document.getElementById('error');
-const resultEl=document.getElementById('result');
-const progressEl=document.getElementById('progress');
-const TOTAL_Q=15;
 
-function updateProgress(){
-  const answered=[...Array(TOTAL_Q)].map((_,i)=>`q${i+1}`).filter(id=>form.querySelector(`input[name=\"${id}\"]:checked`)).length;
-  progressEl.textContent=`Atsakyta: ${answered}/${TOTAL_Q}`;
+<script>
+const form = document.getElementById('stqForm');
+const errorEl = document.getElementById('error');
+const resultEl = document.getElementById('result');
+const progressEl = document.getElementById('progress');
+const TOTAL_Q = 15;
+
+// Progress counter
+function updateProgress() {
+  const answered = [...Array(TOTAL_Q)].map((_, i) => `q${i + 1}`)
+    .filter(id => form.querySelector(`input[name="${id}"]:checked`)).length;
+  progressEl.textContent = `Atsakyta: ${answered}/${TOTAL_Q}`;
 }
 
-form.addEventListener('change',updateProgress);
+form.addEventListener('change', updateProgress);
 
-form.addEventListener('submit',e=>{
+// Interpretacija pagal bendrą balą
+function interpret(total) {
+  if (total >= 60) return { label: 'Aukštas strateginio mąstymo lygis', cls: 'good', text: 'Turite tvirtus sisteminio mąstymo, perframinimo ir refleksijos raumenis. Galite vesti per pokytį ir kompleksiškumą.' };
+  if (total >= 45) return { label: 'Vidutinis lygis', cls: 'mid', text: 'Baziniai gebėjimai yra. Koncentruokitės į krypties aiškinimą, prielaidų tikrinimą ir nuolatinę mokymosi discipliną.' };
+  return { label: 'Žemas lygis', cls: 'bad', text: 'Dominuoja operatyvumas. Rekomenduojama stiprinti sistemos matymą, alternatyvų kūrimą ir AAR/PDCA ritmą.' };
+}
+
+// Greitos rekomendacijos
+function dimTips(scores) {
+  const tips = [];
+  if (scores['Sisteminis mąstymas'] < 15) tips.push('• Sukurkite vertės grandinės žemėlapį ir nustatykite poveikio svertus tarp padalinių.');
+  if (scores['Perframinimas'] < 15) tips.push('• Naudokite sąmoningą scenarijų portfelį (geriausias/blogiausias/neįtikėtinas) ir „advokato velnią“.');
+  if (scores['Refleksija'] < 15) tips.push('• Įdiekite AAR/PDCA ciklą su prielaidų dokumentavimu ir kritiniu grįžtamuoju ryšiu.');
+  if (tips.length === 0) tips.push('• Išlaikykite discipliną: scenarijai, prielaidų testavimas, AAR/PDCA, ir kryžminis poveikio analizavimas.');
+  return tips;
+}
+
+// Detalios interpretacijos pagal dimensijas
+function dimInterpret(scores) {
+  const interpretations = [];
+  // Sisteminis mąstymas
+  if (scores['Sisteminis mąstymas'] >= 20) {
+    interpretations.push('Sisteminis mąstymas: Aukštas – Matote ryšius tarp padalinių ir vertės grandinės, gebate planuoti ilgalaikę kryptį.');
+  } else if (scores['Sisteminis mąstymas'] >= 15) {
+    interpretations.push('Sisteminis mąstymas: Vidutinis – Gebate analizuoti procesus, bet reikia stiprinti poveikio svertus.');
+  } else {
+    interpretations.push('Sisteminis mąstymas: Žemas – Dominuoja lokalus požiūris; kurkite sisteminius scenarijus ir vertės grandinės žemėlapius.');
+  }
+
+  // Perframinimas
+  if (scores['Perframinimas'] >= 20) {
+    interpretations.push('Perframinimas: Aukštas – Efektyviai kuriate alternatyvas, scenarijus ir iššaukiate prielaidas.');
+  } else if (scores['Perframinimas'] >= 15) {
+    interpretations.push('Perframinimas: Vidutinis – Kartais peržiūrite prielaidas, bet trūksta radikalių požiūrio pokyčių.');
+  } else {
+    interpretations.push('Perframinimas: Žemas – Sprendimai dažnai remiasi įprastomis taktikomis; lavinkite scenarijų portfelį ir „advokato velnio“ metodą.');
+  }
+
+  // Refleksija
+  if (scores['Refleksija'] >= 20) {
+    interpretations.push('Refleksija: Aukštas – Nuosekliai dokumentuojate pamokas, ieškote grįžtamojo ryšio ir prielaidų analizės.');
+  } else if (scores['Refleksija'] >= 15) {
+    interpretations.push('Refleksija: Vidutinis – Mokotės iš patirties, bet trūksta sisteminio AAR/PDCA ciklo.');
+  } else {
+    interpretations.push('Refleksija: Žemas – Pamokos lieka paviršutiniškos; rekomenduojama įdiegti struktūrizuotą peržiūrą ir prielaidų dokumentavimą.');
+  }
+
+  return interpretations;
+}
+
+// Submit event
+form.addEventListener('submit', e => {
   e.preventDefault();
-  errorEl.textContent='';
-  for(let i=1;i<=TOTAL_Q;i++){
-    if(!form.querySelector(`input[name=\"q${i}\"]:checked`)){
-      errorEl.textContent=`Neatsakyta į klausimą Nr. ${i}`;
+  errorEl.textContent = '';
+
+  // Validacija
+  for (let i = 1; i <= TOTAL_Q; i++) {
+    if (!form.querySelector(`input[name="q${i}"]:checked`)) {
+      errorEl.textContent = `Neatsakyta į klausimą Nr. ${i}`;
+      form.querySelector(`#q${i}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
   }
-  const scores={'Sisteminis mąstymas':0,'Perframinimas':0,'Refleksija':0};
-  let total=0;
-  for(let i=1;i<=TOTAL_Q;i++){
-    const val=Number(form.querySelector(`input[name=\"q${i}\"]:checked`).value);
-    const dim=form.querySelector(`#q${i}`).dataset.dimension;
-    scores[dim]+=val; total+=val;
+
+  // Skaičiavimas
+  const scores = { 'Sisteminis mąstymas': 0, 'Perframinimas': 0, 'Refleksija': 0 };
+  let total = 0;
+  for (let i = 1; i <= TOTAL_Q; i++) {
+    const val = Number(form.querySelector(`input[name="q${i}"]:checked`).value);
+    const dim = form.querySelector(`#q${i}`).dataset.dimension;
+    scores[dim] += val;
+    total += val;
   }
-  document.getElementById('overallScore').textContent=`Bendras balas: ${total}/75`;
-  const badge=document.getElementById('overallBadge');
-  const text=document.getElementById('overallText');
-  if(total>=60){badge.textContent='Aukštas strateginio mąstymo lygis';badge.className='pill good';text.textContent='Turite tvirtus strateginius raumenis.';}
-  else if(total>=45){badge.textContent='Vidutinis lygis';badge.className='pill mid';text.textContent='Reikia stiprinti kryptį ir refleksiją.';}
-  else{badge.textContent='Žemas lygis';badge.className='pill bad';text.textContent='Dominuoja operatyvumas; rekomenduojama lavinti STQ įgūdžius.';}
-  document.getElementById('barSys').style.width=(scores['Sisteminis mąstymas']/25*100)+'%';
-  document.getElementById('labelSys').textContent=`${scores['Sisteminis mąstymas']}/25`;
-  document.getElementById('barReframe').style.width=(scores['Perframinimas']/25*100)+'%';
-  document.getElementById('labelReframe').textContent=`${scores['Perframinimas']}/25`;
-  document.getElementById('barReflect').style.width=(scores['Refleksija']/25*100)+'%';
-  document.getElementById('labelReflect').textContent=`${scores['Refleksija']}/25`;
-  const tips=document.getElementById('tips');tips.innerHTML='';
-  if(scores['Sisteminis mąstymas']<15)tips.innerHTML+='<li>Stiprinti sisteminį matymą.</li>';
-  if(scores['Perframinimas']<15)tips.innerHTML+='<li>Lavinti scenarijų kūrimą ir idėjų peržiūrą.</li>';
-  if(scores['Refleksija']<15)tips.innerHTML+='<li>Įdiegti AAR/PDCA ciklus.</li>';
-  resultEl.style.display='block';
+
+  // Bendras balas
+  document.getElementById('overallScore').textContent = `Bendras balas: ${total}/75`;
+  const itp = interpret(total);
+  const badge = document.getElementById('overallBadge');
+  badge.className = `pill ${itp.cls}`;
+  badge.textContent = itp.label;
+  document.getElementById('overallText').textContent = itp.text;
+
+  // Progress bar
+  const pct = x => Math.round((x / 25) * 100);
+  document.getElementById('barSys').style.width = pct(scores['Sisteminis mąstymas']) + '%';
+  document.getElementById('labelSys').textContent = `${scores['Sisteminis mąstymas']}/25`;
+  document.getElementById('barReframe').style.width = pct(scores['Perframinimas']) + '%';
+  document.getElementById('labelReframe').textContent = `${scores['Perframinimas']}/25`;
+  document.getElementById('barReflect').style.width = pct(scores['Refleksija']) + '%';
+  document.getElementById('labelReflect').textContent = `${scores['Refleksija']}/25`;
+
+  // Rekomendacijos
+  const tips = dimTips(scores);
+  const ulTips = document.getElementById('tips');
+  ulTips.innerHTML = '';
+  tips.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    ulTips.appendChild(li);
+  });
+
+  // Detalios interpretacijos
+  const dimUl = document.getElementById('dimInterpret');
+  if (dimUl) {
+    dimUl.innerHTML = '';
+    dimInterpret(scores).forEach(text => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      dimUl.appendChild(li);
+    });
+  }
+
+  resultEl.style.display = 'block';
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
-document.getElementById('resetBtn').addEventListener('click',()=>{
-  form.reset();updateProgress();resultEl.style.display='none';errorEl.textContent='';
+// Reset
+document.getElementById('resetBtn').addEventListener('click', () => {
+  form.reset();
+  updateProgress();
+  resultEl.style.display = 'none';
+  errorEl.textContent = '';
 });
 </script>
+
 </body>
 </html>
 
