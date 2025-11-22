@@ -1,261 +1,142 @@
+
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Strateginio mąstymo testas</title>
-
-  <!-- ✅ Teisinga Google Fonts nuoroda -->
-  <link href="https://fonts.googleapis.com/cssoto:wght@400;700&display=swap
-
+  <title>Strateginio mąstymo testas (STQ)</title>
   <style>
     :root{
-      --bg:#121212;
-      --card:#1e1e1e;
-      --text:#f1f1f1;
-      --accent:#00bcd4;
-      --accent-dark:#0097a7;
-      --muted:#333;
-      --green:#4caf50;
-      --yellow:#ffeb3b;
-      --red:#f44336;
+      --bg:#0F1115; --card:#171923; --text:#E6E6E6; --muted:#A7B0BE;
+      --accent:#4F8FF7; --good:#37C77F; --warn:#F5A623; --bad:#FF5E5E;
     }
-
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Roboto', system-ui, -apple-system, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 24px;
-      line-height: 1.5;
-    }
-
-    .container {
-      max-width: 920px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      text-align: center;
-      margin: 0 0 18px 0;
-      color: var(--accent);
-      font-weight: 700;
-      letter-spacing: 0.2px;
-    }
-
-    .subtitle {
-      text-align: center;
-      margin-bottom: 18px;
-      color: #cfd8dc;
-      font-size: 14px;
-    }
-
-    /* Progress bar */
-    .progress {
-      width: 100%;
-      background: var(--muted);
-      border-radius: 8px;
-      overflow: hidden;
-      height: 12px;
-      margin: 16px 0 20px 0;
-    }
-    .progress-bar {
-      height: 12px;
-      width: 0%;
-      background: var(--accent);
-      transition: width 0.40s ease;
-    }
-
-    /* Card (question) */
-    .question {
-      background: var(--card);
-      padding: 16px;
-      margin-bottom: 16px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.35);
-      opacity: 0;
-      transform: translateY(16px);
-      animation: fadeIn 0.6s forwards;
-    }
-
-    .question p {
-      margin: 0 0 10px 0;
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .options label {
-      display: block;
-      padding: 10px 12px;
-      margin: 6px 0;
-      border-radius: 8px;
-      border: 1px solid #2a2a2a;
-      background: #191919;
-      cursor: pointer;
-      transition: background 0.25s, border-color 0.25s;
-    }
-    .options label:hover {
-      background: #202020;
-      border-color: var(--accent);
-    }
-    .options input {
-      margin-right: 8px;
-      transform: translateY(1px);
-    }
-
-    /* Buttons */
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      max-width: 520px;
-      margin: 18px auto 0;
-    }
-    button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 12px 16px;
-      font-size: 16px;
-      font-weight: 700;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.25s, transform 0.08s;
-      box-shadow: 0 6px 12px rgba(0, 188, 212, 0.25);
-    }
-    button:hover { background: var(--accent-dark); }
-    button:active { transform: scale(0.99); }
-
-    /* Result pill */
-    #result {
-      text-align: center;
-      font-size: 16px;
-      margin-top: 18px;
-      font-weight: 700;
-      padding: 12px;
-      border-radius: 10px;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-    }
-
-    @keyframes fadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Mobile */
-    @media (max-width: 640px){
-      body { padding: 18px; }
-      .question p { font-size: 16px; }
-      .actions { grid-template-columns: 1fr; }
-      button { font-size: 15px; }
-    }
+    body{background:var(--bg); color:var(--text); font-family:Inter, sans-serif; margin:0;}
+    .container{max-width:900px; margin:auto; padding:20px;}
+    h1{font-size:28px; margin-bottom:8px;}
+    .subtitle{color:var(--muted);}
+    .card{background:var(--card); border-radius:12px; padding:16px; margin:16px 0;}
+    .question{margin:14px 0;}
+    .q-title{font-weight:600; margin-bottom:8px;}
+    .options{display:grid; gap:8px;}
+    .option{background:#1e2130; padding:10px; border-radius:8px;}
+    input[type=radio]{accent-color:var(--accent);}
+    .actions{margin-top:20px; display:flex; gap:12px;}
+    button{padding:12px 16px; border:none; border-radius:8px; font-weight:600; cursor:pointer;}
+    .primary{background:var(--accent); color:#fff;}
+    .secondary{background:transparent; color:var(--accent); border:1px solid var(--accent);}
+    .error{color:var(--bad); font-weight:600;}
+    .result{display:none; margin-top:20px;}
+    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-size:13px;}
+    .pill.good{background:#123423; color:#8de7ba;}
+    .pill.mid{background:#2d2812; color:#f9d57a;}
+    .pill.bad{background:#351515; color:#ffa5a5;}
+    .bar{height:18px; background:var(--accent); border-radius:6px;}
+    .bar-wrap{background:#0b0d16; border-radius:8px; padding:8px; margin-bottom:8px;}
+    .bar-label{display:flex; justify-content:space-between; color:var(--muted); font-size:13px;}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Strateginio mąstymo testas</h1>
-    <div class="subtitle">Bandomoji versija su 1 klausimu (testuojame dizainą ir funkcijas)</div>
+<div class="container">
+  <h1>Strateginio mąstymo testas (STQ)</h1>
+  <p class="subtitle">Instrukcija: Pasirinkite vieną atsakymą, kuris tiksliausiai atspindi Jūsų įprastą veiksmą tokioje situacijoje.</p>
+  <p id="progress" style="color:var(--muted)">Atsakyta: 0/15</p>
 
-    <!-- progress -->
-    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
-
-    <form id="strategyTest" autocomplete="off">
-      <!-- ✅ Klausimas #1 (Sisteminis mąstymas) -->
-      <div class="question" id="qCard0">
-        <p>1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</p>
+  <form id="stqForm">
+    <!-- Klausimai (pavyzdys Q1, Q2 – likusius kopijuok iš dokumento) -->
+    <div class="card">
+      <h2>I. Sisteminis mąstymas</h2>
+      <fieldset class="question" data-dimension="Sisteminis mąstymas" id="q1">
+        <legend class="q-title">1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</legend>
         <div class="options">
-          <label><input type="radio" name="q0" value="4"> ...naudoju formalią matricą, kad įvertinčiau tiesioginį poveikį visiems susijusiems skyriams ir skyrių motyvacijai.</label>
-          <label><input type="radio" name="q0" value="1"> ...visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą, ignoruodamas galimus padarinius kitur.</label>
-          <label><input type="radio" name="q0" value="5"> ...analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei, kad užtikrinčiau, jog pokytis nepažeis bendro įmonės konkurencinio pranašumo.</label>
-          <label><input type="radio" name="q0" value="3"> ...paklausiu kelių kitų skyrių vadovų nuomonės apie galimus neigiamus padarinius jų darbui.</label>
-          <label><input type="radio" name="q0" value="2"> ...atsižvelgiu į gretimų skyrių prieštaravimus, bet vis tiek darau tai, kas geriausia mano skyriui.</label>
+          <label class="option"><input type="radio" name="q1" value="4"/> naudoju formalią matricą...</label>
+          <label class="option"><input type="radio" name="q1" value="1"/> visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą...</label>
+          <label class="option"><input type="radio" name="q1" value="5"/> analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei...</label>
+          <label class="option"><input type="radio" name="q1" value="3"/> paklausiu kelių kitų skyrių vadovų nuomonės...</label>
+          <label class="option"><input type="radio" name="q1" value="2"/> atsižvelgiu į gretimų skyrių prieštaravimus...</label>
         </div>
-      </div>
-    </form>
-
-    <!-- actions -->
-    <div class="actions">
-      <button type="button" id="btnCalc">Skaičiuoti rezultatą</button>
-      <button type="button" id="btnPdf">Generuoti PDF</button>
+      </fieldset>
+      <!-- Įterpk visus likusius klausimus Q2–Q15 iš dokumento -->
     </div>
 
-    <!-- result -->
-    <div id="result">Užpildyk klausimą ir paspausk „Skaičiuoti rezultatą“.</div>
-  </div>
+    <div class="actions">
+      <button type="submit" class="primary">Pateikti atsakymus</button>
+      <button type="button" id="resetBtn" class="secondary">Išvalyti</button>
+      <span id="error" class="error"></span>
+    </div>
+  </form>
 
-  <!-- Libraries for PDF -->
-  https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js</script>
-  <script src="https://cdnjsom/ajax/libs/html2canvas/1.4.1/html2canvas.min.js</script>
-  https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js</script>
+  <section id="result" class="result">
+    <div class="card">
+      <h2>Rezultatai</h2>
+      <p id="overallScore"></p>
+      <div id="overallBadge" class="pill"></div>
+      <p id="overallText"></p>
+      <div class="bar-wrap">
+        <div class="bar" id="barSys" style="width:0%"></div>
+        <div class="bar-label"><span>Sisteminis mąstymas</span><span id="labelSys">0/25</span></div>
+        <div class="bar" id="barReframe" style="width:0%; margin-top:8px"></div>
+        <div class="bar-label"><span>Perframinimas</span><span id="labelReframe">0/25</span></div>
+        <div class="bar" id="barReflect" style="width:0%; margin-top:8px"></div>
+        <div class="bar-label"><span>Refleksija</span><span id="labelReflect">0/25</span></div>
+      </div>
+      <ul id="tips"></ul>
+    </div>
+  </section>
+</div>
 
-  <script>
-    // progress
-    const progressBar = document.getElementById('progressBar');
-    const inputs = document.querySelectorAll('input[type="radio"][name="q0"]');
-    function updateProgress(){
-      const answered = document.querySelector('input[name="q0"]:checked') ? 1 : 0;
-      progressBar.style.width = (answered/1*100) + '%';
+<script>
+const form=document.getElementById('stqForm');
+const errorEl=document.getElementById('error');
+const resultEl=document.getElementById('result');
+const progressEl=document.getElementById('progress');
+const TOTAL_Q=15;
+
+function updateProgress(){
+  const answered=[...Array(TOTAL_Q)].map((_,i)=>`q${i+1}`).filter(id=>form.querySelector(`input[name=\"${id}\"]:checked`)).length;
+  progressEl.textContent=`Atsakyta: ${answered}/${TOTAL_Q}`;
+}
+
+form.addEventListener('change',updateProgress);
+
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  errorEl.textContent='';
+  for(let i=1;i<=TOTAL_Q;i++){
+    if(!form.querySelector(`input[name=\"q${i}\"]:checked`)){
+      errorEl.textContent=`Neatsakyta į klausimą Nr. ${i}`;
+      return;
     }
-    inputs.forEach(i => i.addEventListener('change', updateProgress));
+  }
+  const scores={'Sisteminis mąstymas':0,'Perframinimas':0,'Refleksija':0};
+  let total=0;
+  for(let i=1;i<=TOTAL_Q;i++){
+    const val=Number(form.querySelector(`input[name=\"q${i}\"]:checked`).value);
+    const dim=form.querySelector(`#q${i}`).dataset.dimension;
+    scores[dim]+=val; total+=val;
+  }
+  document.getElementById('overallScore').textContent=`Bendras balas: ${total}/75`;
+  const badge=document.getElementById('overallBadge');
+  const text=document.getElementById('overallText');
+  if(total>=60){badge.textContent='Aukštas strateginio mąstymo lygis';badge.className='pill good';text.textContent='Turite tvirtus strateginius raumenis.';}
+  else if(total>=45){badge.textContent='Vidutinis lygis';badge.className='pill mid';text.textContent='Reikia stiprinti kryptį ir refleksiją.';}
+  else{badge.textContent='Žemas lygis';badge.className='pill bad';text.textContent='Dominuoja operatyvumas; rekomenduojama lavinti STQ įgūdžius.';}
+  document.getElementById('barSys').style.width=(scores['Sisteminis mąstymas']/25*100)+'%';
+  document.getElementById('labelSys').textContent=`${scores['Sisteminis mąstymas']}/25`;
+  document.getElementById('barReframe').style.width=(scores['Perframinimas']/25*100)+'%';
+  document.getElementById('labelReframe').textContent=`${scores['Perframinimas']}/25`;
+  document.getElementById('barReflect').style.width=(scores['Refleksija']/25*100)+'%';
+  document.getElementById('labelReflect').textContent=`${scores['Refleksija']}/25`;
+  const tips=document.getElementById('tips');tips.innerHTML='';
+  if(scores['Sisteminis mąstymas']<15)tips.innerHTML+='<li>Stiprinti sisteminį matymą.</li>';
+  if(scores['Perframinimas']<15)tips.innerHTML+='<li>Lavinti scenarijų kūrimą ir idėjų peržiūrą.</li>';
+  if(scores['Refleksija']<15)tips.innerHTML+='<li>Įdiegti AAR/PDCA ciklus.</li>';
+  resultEl.style.display='block';
+});
 
-    // calc
-    document.getElementById('btnCalc').addEventListener('click', () => {
-      const sel = document.querySelector('input[name="q0"]:checked');
-      if(!sel){
-        setResult('Atsakyk į klausimą.', 'neutral');
-        return;
-      }
-      const val = parseInt(sel.value,10);
-      // Interpretacija pagal vidurkį (čia tik 1 klausimas)
-      let interpretation, color;
-      if(val >= 4){ interpretation = 'Strateginis mąstytojas'; color = 'var(--green)'; }
-      else if(val >= 3){ interpretation = 'Vidutinis strateginis mąstymas'; color = 'var(--yellow)'; }
-      else { interpretation = 'Operatyvinis mąstymas'; color = 'var(--red)'; }
-      setResult(`Rezultatas: ${interpretation} (Balas: ${val})`, color);
-      localStorage.setItem('strategyResult', JSON.stringify({avg: val}));
-    });
-
-    function setResult(text, colorToken){
-      const box = document.getElementById('result');
-      box.textContent = text;
-      if(colorToken === 'neutral'){
-        box.style.background = '#1a1a1a';
-        box.style.borderColor = '#2a2a2a';
-      } else {
-        box.style.background = colorToken;
-        box.style.color = (colorToken === 'var(--yellow)') ? '#000' : '#fff';
-        box.style.borderColor = '#00000020';
-      }
-    }
-
-    // pdf
-    document.getElementById('btnPdf').addEventListener('click', () => {
-      const { jsPDF } = window.jspdf;
-      const data = JSON.parse(localStorage.getItem('strategyResult') || '{"avg":0}');
-      const doc = new jsPDF();
-
-      doc.setFontSize(16);
-      doc.text('Strateginio mąstymo testo rezultatai', 10, 12);
-      doc.setFontSize(12);
-      doc.text(`Sugeneruota: ${new Date().toISOString().split('T')[0]}`, 10, 20);
-      doc.text(`Vidurkis (1 klaus.): ${Number(data.avg || 0).toFixed(2)}`, 10, 28);
-
-      // Paprasta KPI lentelė (pavyzdys)
-      doc.autoTable({
-        head: [['Tikslas','Veiksmas','Terminas','Atsakingas']],
-        body: [
-          ['Pagerinti sisteminį mąstymą','Analizuoti prielaidų poveikį','30 d.','Vadovas'],
-          ['Didinti refleksiją','Rašyti trumpą dienoraštį po sprendimų','30 d.','Vadovas']
-        ],
-        startY: 36
-      });
-
-      doc.text('Pastaba: Rekomendacijos sugeneruotos taisyklių pagrindu pagal balus.', 10, doc.lastAutoTable.finalY + 10);
-      doc.text('Autorius: Oleg Mozochin | STQ metodas', 10, doc.lastAutoTable.finalY + 18);
-
-      doc.save('Strateginis_Testas.pdf');
-    });
-  </script>
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  form.reset();updateProgress();resultEl.style.display='none';errorEl.textContent='';
+});
+</script>
 </body>
 </html>
+
