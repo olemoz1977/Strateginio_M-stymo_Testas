@@ -515,14 +515,48 @@ document.getElementById('downloadPDF').addEventListener('click', () => {
     html2pdf().set(options).from(element).save();
 });
     
-cument.querySelectorAll('input[type="radio"]').forEach(radio => {
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
     radio.addEventListener('change', () => {
         localStorage.setItem(radio.name, radio.value);
     });
 });
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script>  
+script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script> 
+</script>
+
+<!-- PDF biblioteka -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdfl2pdf.bundle.min.js</script>
+
+<script>
+// PDF atsisiuntimas
+document.getElementById('downloadPDF').addEventListener('click', () => {
+    const element = document.querySelector('body'); // arba konkretus div su testu
+    const options = {
+        margin: 10,
+        filename: 'Strateginio_mąstymo_testas.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(options).from(element).save();
+});
+
+// Atsakymų išsaugojimas
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        localStorage.setItem(radio.name, radio.value);
+    });
+});
+
+// Atkūrimas po perkrovimo
+window.addEventListener('load', () => {
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        if (localStorage.getItem(radio.name) === radio.value) {
+            radio.checked = true;
+        }
+    });
+});
 </script>
 
 </body>
