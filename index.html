@@ -338,7 +338,7 @@
     </div>
 
     <div class="actions">
-      <button type="submit" class="primary">Pateikti atsakymus</button>
+      <button type="button" class="primary">Pateikti atsakymus</button>
       <button type="button" id="resetBtn" class="secondary">Išvalyti</button>
       
 <!-- Mygtukas PDF atsisiuntimui -->
@@ -348,24 +348,35 @@
     </div>
   </form>
 
-  <section id="result" class="result">
-    <div class="card">
-      <h2>Rezultatai</h2>
-      <p id="overallScore"></p>
-      <div id="overallBadge" class="pill"></div>
-      <p id="overallText"></p>
-      <div class="bar-wrap">
-        <div class="bar" id="barSys" style="width:0%"></div>
-        <div class="bar-label"><span>Sisteminis mąstymas</span><span id="labelSys">0/25</span></div>
-        <div class="bar" id="barReframe" style="width:0%; margin-top:8px"></div>
-        <div class="bar-label"><span>Perframinimas</span><span id="labelReframe">0/25</span></div>
-        <div class="bar" id="barReflect" style="width:0%; margin-top:8px"></div>
-        <div class="bar-label"><span>Refleksija</span><span id="labelReflect">0/25</span></div>
-      </div>
-      <ul id="tips"></ul>
+<!-- Rezultatų sekcija -->
+<section id="result" class="result" style="display:none;">
+  <div class="card">
+    <h2>Rezultatai</h2>
+    <p id="overallScore"></p>
+    <div id="overallBadge" class="pill"></div>
+    <p id="overallText"></p>
+    <div class="bar-wrap">
+      <div class="bar" id="barSys" style="width:0%"></div>
+      <div class="bar-label"><span>Sisteminis mąstymas</span><span id="labelSys">0/25</span></div>
+      <div class="bar" id="barReframe" style="width:0%; margin-top:8px"></div>
+      <div class="bar-label"><span>Perframinimas</span><span id="labelReframe">0/25</span></div>
+      <div class="bar" id="barReflect" style="width:0%; margin-top:8px"></div>
+      <div class="bar-label"><span>Refleksija</span><span id="labelReflect">0/25</span></div>
     </div>
-  </section>
+    <ul id="tips"></ul>
+    <ul id="dimInterpret"></ul>
+  </div>
+</section>
+
+<!-- Mygtukai -->
+<div style="margin-top:20px;">
+  <button id="submitBtn" type="button">Pateikti atsakymus</button>
+  <button id="clearBtn" type="button">Išvalyti atsakymus</button>
+  <button id="downloadPDF" type="button">Atsisiųsti PDF</button>
 </div>
+
+<!-- Biblioteka PDF -->
+https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js</script>
 
 
 <script>
