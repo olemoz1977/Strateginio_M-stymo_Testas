@@ -39,7 +39,7 @@
 <div class="container">
   <h1>Strateginio mąstymo testas (STQ)</h1>
   <p class="subtitle">Instrukcija: Pasirinkite vieną atsakymą, kuris tiksliausiai atspindi Jūsų įprastą veiksmą tokioje situacijoje.</p>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script>
+
   <p id="progress" style="color:var(--muted)">Atsakyta: 0/15</p>
 
   <form id="stqForm">
@@ -535,7 +535,7 @@ document.getElementById('downloadPDF').addEventListener('click', () => {
     };
     html2pdf().set(options).from(element).save();
 });
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script>  
 </script>
 
 </body>
