@@ -39,6 +39,7 @@
 <div class="container">
   <h1>Strateginio mąstymo testas (STQ)</h1>
   <p class="subtitle">Instrukcija: Pasirinkite vieną atsakymą, kuris tiksliausiai atspindi Jūsų įprastą veiksmą tokioje situacijoje.</p>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script>
   <p id="progress" style="color:var(--muted)">Atsakyta: 0/15</p>
 
   <form id="stqForm">
@@ -339,6 +340,10 @@
     <div class="actions">
       <button type="submit" class="primary">Pateikti atsakymus</button>
       <button type="button" id="resetBtn" class="secondary">Išvalyti</button>
+      
+<!-- Mygtukas PDF atsisiuntimui -->
+<button type="button" id="downloadPDF" class="secondary">Atsisiųsti PDF</button>
+
       <span id="error" class="error"></span>
     </div>
   </form>
@@ -364,6 +369,22 @@
 
 
 <script>
+  
+cument.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        localStorage.setItem(radio.name, radio.value);
+    });
+});
+
+// Atkurti atsakymus po perkrovimo
+window.addEventListener('load', () => {
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        if (localStorage.getItem(radio.name) === radio.value) {
+            radio.checked = true;
+        }
+    });
+});
+
 const form = document.getElementById('stqForm');
 const errorEl = document.getElementById('error');
 const resultEl = document.getElementById('result');
@@ -502,6 +523,19 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   resultEl.style.display = 'none';
   errorEl.textContent = '';
 });
+    
+document.getElementById('downloadPDF').addEventListener('click', () => {
+    const element = document.querySelector('body'); // arba konkretus div su testu
+    const options = {
+        margin: 10,
+        filename: 'Strateginio_mąstymo_testas.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(options).from(element).save();
+});
+
 </script>
 
 </body>
