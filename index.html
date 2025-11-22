@@ -369,21 +369,7 @@
 
 
 <script>
-  
-cument.querySelectorAll('input[type="radio"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        localStorage.setItem(radio.name, radio.value);
-    });
-});
 
-// Atkurti atsakymus po perkrovimo
-window.addEventListener('load', () => {
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        if (localStorage.getItem(radio.name) === radio.value) {
-            radio.checked = true;
-        }
-    });
-});
 
 const form = document.getElementById('stqForm');
 const errorEl = document.getElementById('error');
@@ -534,6 +520,21 @@ document.getElementById('downloadPDF').addEventListener('click', () => {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     html2pdf().set(options).from(element).save();
+});
+    
+cument.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        localStorage.setItem(radio.name, radio.value);
+    });
+});
+
+// Atkurti atsakymus po perkrovimo
+window.addEventListener('load', () => {
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        if (localStorage.getItem(radio.name) === radio.value) {
+            radio.checked = true;
+        }
+    });
 });
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script>  
 </script>
