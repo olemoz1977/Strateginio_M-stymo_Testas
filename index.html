@@ -502,14 +502,7 @@ form.addEventListener('submit', e => {
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
-// Reset
-document.getElementById('resetBtn').addEventListener('click', () => {
-  form.reset();
-  updateProgress();
-  resultEl.style.display = 'none';
-  errorEl.textContent = '';
-});
-    
+
 document.getElementById('downloadPDF').addEventListener('click', () => {
     const element = document.querySelector('body'); // arba konkretus div su testu
     const options = {
@@ -528,14 +521,7 @@ cument.querySelectorAll('input[type="radio"]').forEach(radio => {
     });
 });
 
-// Atkurti atsakymus po perkrovimo
-window.addEventListener('load', () => {
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        if (localStorage.getItem(radio.name) === radio.value) {
-            radio.checked = true;
-        }
-    });
-});
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script>  
 </script>
 
