@@ -2,574 +2,321 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Strateginio mąstymo testas (STQ)</title>
   <style>
     :root{
-      --bg:#0F1115; --card:#171923; --text:#E6E6E6; --muted:#A7B0BE;
-      --accent:#4F8FF7; --good:#37C77F; --warn:#F5A623; --bad:#FF5E5E;
+      --bg:#0f172a; --card:#111827; --ink:#e5e7eb; --muted:#9ca3af;
+      --brand:#14b8a6; --warn:#f59e0b; --danger:#ef4444;
     }
-    body{background:var(--bg); color:var(--text); font-family:Inter, sans-serif; margin:0;}
-    .container{max-width:900px; margin:auto; padding:20px;}
-    h1{font-size:28px; margin-bottom:8px;}
-    .subtitle{color:var(--muted);}
-    .card{background:var(--card); border-radius:12px; padding:16px; margin:16px 0;}
-    .question{margin:14px 0;}
-    .q-title{font-weight:600; margin-bottom:8px;}
-    .options{display:grid; gap:8px;}
-    .option{background:#1e2130; padding:10px; border-radius:8px;}
-    input[type=radio]{accent-color:var(--accent);}
-    .actions{margin-top:20px; display:flex; gap:12px;}
-    button{padding:12px 16px; border:none; border-radius:8px; font-weight:600; cursor:pointer;}
-    .primary{background:var(--accent); color:#fff;}
-    .secondary{background:transparent; color:var(--accent); border:1px solid var(--accent);}
-    .error{color:var(--bad); font-weight:600;}
-    .result{display:none; margin-top:20px;}
-    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-size:13px;}
-    .pill.good{background:#123423; color:#8de7ba;}
-    .pill.mid{background:#2d2812; color:#f9d57a;}
-    .pill.bad{background:#351515; color:#ffa5a5;}
-    .bar{height:18px; background:var(--accent); border-radius:6px;}
-    .bar-wrap{background:#0b0d16; border-radius:8px; padding:8px; margin-bottom:8px;}
-    .bar-label{display:flex; justify-content:space-between; color:var(--muted); font-size:13px;}
+    html,body{height:100%}
+    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+         background:linear-gradient(180deg,var(--bg),#090d1a);color:var(--ink);margin:0}
+    header{position:sticky;top:0;background:#0b1224cc;backdrop-filter:saturate(140%) blur(6px);
+           border-bottom:1px solid #1f2937}
+    header .wrap{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;gap:16px;align-items:center}
+    h1{font-size:clamp(20px,3.2vw,28px);margin:0}
+    main{max-width:980px;margin:24px auto;padding:0 16px}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    .intro{padding:18px 20px}
+    .progress{height:8px;background:#0b1224;border-radius:99px;overflow:hidden;margin-top:8px}
+    .progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#60a5fa);width:0%}
+    .q{padding:18px 20px;border-top:1px solid #1f2937}
+    .q h3{margin:0 0 8px;font-size:18px}
+    .choices{display:grid;gap:6px}
+    .choices label{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:10px;
+                   border:1px solid #1f2937;background:#0b1224;cursor:pointer}
+    .choices input{margin-top:2px}
+    .group-title{color:var(--muted);font-weight:600;margin:4px 0 10px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;padding:16px;border-top:1px solid #1f2937}
+    button{appearance:none;border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .primary{background:var(--brand);color:#052327}
+    .ghost{background:#0b1224;color:var(--ink);border:1px solid #1f2937}
+    .danger{background:var(--danger);color:#fff}
+    .warn{background:var(--warn);color:#1f2937}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;padding:16px}
+    .kpi{background:#0b1224;border:1px solid #1f2937;border-radius:12px;padding:12px}
+    .kpi h4{margin:0 0 6px}
+    .muted{color:var(--muted)}
+    footer{max-width:980px;margin:24px auto;padding:0 16px 24px;color:var(--muted)}
+    @media print{
+      header,.actions{display:none}
+      body{background:#fff;color:#000}
+      .card{border:none;box-shadow:none}
+      .choices label{background:#fff;border-color:#ddd}
+    }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>Strateginio mąstymo testas (STQ)</h1>
-  <p class="subtitle">Instrukcija: Pasirinkite vieną atsakymą, kuris tiksliausiai atspindi Jūsų įprastą veiksmą tokioje situacijoje.</p>
-
-  <p id="progress" style="color:var(--muted)">Atsakyta: 0/15</p>
-
-  <form id="stqForm">
-    <!-- Klausimai (pavyzdys Q1, Q2 – likusius kopijuok iš dokumento) -->
-    <div class="card">
-      <h2>I. Sisteminis mąstymas</h2>
-      <fieldset class="question" data-dimension="Sisteminis mąstymas" id="q1">
-        <legend class="q-title">1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...</legend>
-        <div class="options">
-          <label class="option"><input type="radio" name="q1" value="4"/> naudoju formalią matricą...</label>
-          <label class="option"><input type="radio" name="q1" value="1"/> visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą...</label>
-          <label class="option"><input type="radio" name="q1" value="5"/> analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei...</label>
-          <label class="option"><input type="radio" name="q1" value="3"/> paklausiu kelių kitų skyrių vadovų nuomonės...</label>
-          <label class="option"><input type="radio" name="q1" value="2"/> atsižvelgiu į gretimų skyrių prieštaravimus...</label>
-        </div>
-      </fieldset>
-      
-<!-- Q2 -->
-<fieldset class="question" data-dimension="Sisteminis mąstymas" id="q2">
-  <legend class="q-title">2. Susidūrus su klientų praradimu, aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q2" value="5"/> analizuoju ne tik vidinius procesus, bet ir išorinius rinkos pokyčius bei konkurentų veiksmus, siekdamas atpažinti ilgalaikes tendencijas, kurios galėjo pakeisti klientų poreikius.</label>
-    <label class="option"><input type="radio" name="q2" value="2"/> peržiūriu paskutinių savaičių pardavimų ataskaitas, kad pamatyčiau, kurioje srityje praradome daugiausiai.</label>
-    <label class="option"><input type="radio" name="q2" value="1"/> iš karto kaltinu pardavimų skyrių ir reikalauju nedelsiant padidinti pardavimus per šį mėnesį.</label>
-    <label class="option"><input type="radio" name="q2" value="4"/> stengiuosi atsekti, kokios vidinės klaidos (pvz., IT sistemos lėtumas ar biurokratiniai procesai) lėmė klientų patirties pablogėjimą.</label>
-    <label class="option"><input type="radio" name="q2" value="3"/> peržiūriu tiek pardavimų, tiek produktų kokybės duomenis, ieškodamas akivaizdžių nesutapimų.</label>
-  </div>
-</fieldset>
-
-<!-- Q3 -->
-<fieldset class="question" data-dimension="Sisteminis mąstymas" id="q3">
-  <legend class="q-title">3. Mano požiūris į ilgalaikes makroekonomines ir technologines tendencijas (pvz., AI, reguliavimas) yra...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q3" value="2"/> aš perskaitau pagrindines naujienas, bet tai neturi įtakos mano savaitiniams sprendimams.</label>
-    <label class="option"><input type="radio" name="q3" value="5"/> aš reguliariai inicijuoju scenarijų planavimo susitikimus, kad įvertinčiau, kaip šios tendencijos gali priversti mūsų įmonę fundamentaliai pakeisti verslo modelį per ateinančius 5 metus.</label>
-    <label class="option"><input type="radio" name="q3" value="1"/> kad tai yra aukščiausios vadovybės reikalas, o aš turiu susitelkti į šiandienos rezultatus.</label>
-    <label class="option"><input type="radio" name="q3" value="3"/> aš kartais diskutuoju apie tai su komanda, bandydamas rasti idėjų, bet neturiu nuolatinio proceso.</label>
-    <label class="option"><input type="radio" name="q3" value="4"/> aš nuolat stebiu šias tendencijas ir peržiūriu savo skyriaus prioritetus kas ketvirtį.</label>
-  </div>
-</fieldset>
-
-<!-- Q4 -->
-<fieldset class="question" data-dimension="Sisteminis mąstymas" id="q4">
-  <legend class="q-title">4. Kai iškyla problemos, kurios viršija mano skyriaus kompetenciją, aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q4" value="2"/> bandau išspręsti problemą tik savo skyriaus resursais, kad parodyčiau efektyvumą.</label>
-    <label class="option"><input type="radio" name="q4" value="5"/> sistemiškai ieškau pasikartojančios organizacinės priežasties (pvz., neaiškių atsakomybių, silpnų IT sąsajų), dėl kurios ši problema nuolat atsiranda keliuose skyriuose.</label>
-    <label class="option"><input type="radio" name="q4" value="1"/> visą atsakomybę perduodu aukštesnei vadovybei arba kitam skyriui, ir nustoju stebėti eigą.</label>
-    <label class="option"><input type="radio" name="q4" value="3"/> bendradarbiauju su vienu ar dviem susijusiais skyriais, kad rasčiau kompromisą.</label>
-    <label class="option"><input type="radio" name="q4" value="4"/> inicijuoju tarpfunkcinį (angl. cross-functional) susitikimą, kad išanalizuočiau, kaip problemai spręsti reikia bendros kelių skyrių sistemos.</label>
-  </div>
-</fieldset>
-
-<!-- Q5 -->
-<fieldset class="question" data-dimension="Sisteminis mąstymas" id="q5">
-  <legend class="q-title">5. Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q5" value="5"/> kritinių prielaidų nustatymui apie ateitį (pvz., ar rinka augs, ar technologijos keisis) ir planų kūrimui, kaip veiksime, jei tos prielaidos pasirodys klaidingos.</label>
-    <label class="option"><input type="radio" name="q5" value="2"/> išteklių paskirstymui pagal dabartinius projektų prioritetus.</label>
-    <label class="option"><input type="radio" name="q5" value="1"/> tikslų nustatymui, pagrįstam praėjusių metų rezultatais.</label>
-    <label class="option"><input type="radio" name="q5" value="4"/> įvairioms rizikoms ir galimybėms, įtraukiant tiek vidinius, tiek išorinius veiksnius.</label>
-    <label class="option"><input type="radio" name="q5" value="3"/> išsamiai analizei, kaip pasiekti konkurencinį pranašumą artimiausiu metu (iki 1 metų).</label>
-  </div>
-</fieldset>
-
-<!-- Q6 -->
-<fieldset class="question" data-dimension="Perframinimas" id="q6">
-  <legend class="q-title">6. Komandai nepavykstant įveikti sudėtingos kliūties (pvz., nepasiekiami pardavimų tikslai), aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q6" value="4"/>
-      liepiu komandai pilnai sustabdyti veiklą ir sugalvoti 5 skirtingus būdus, kaip būtų galima iš naujo apibrėžti problemą
-      (pvz., ne "pardavimų trūkumas", o "vertės pasiūlymo neatitikimas").
-    </label>
-    <label class="option"><input type="radio" name="q6" value="5"/>
-      organizuoju dirbtuves, kurios skirtos problemai spręsti iš kito vaidmens perspektyvos
-      (pvz., "Ką darytų mūsų konkurentas/klientas šioje situacijoje?"), kad sugeneruotume visiškai naują požiūrį.
-    </label>
-    <label class="option"><input type="radio" name="q6" value="2"/>
-      paprašau jų pateikti 3–4 naujus, bet panašius veiksmų planus.
-    </label>
-    <label class="option"><input type="radio" name="q6" value="1"/>
-      primenu jiems, kad reikia stengtis labiau ir naudoti jau patvirtintas taktikas.
-    </label>
-    <label class="option"><input type="radio" name="q6" value="3"/>
-      inicijuoju diskusiją, kurios metu siūlomos ir radikaliai kitokios idėjos.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q7 -->
-<fieldset class="question" data-dimension="Perframinimas" id="q7">
-  <legend class="q-title">7. Ruošiantis svarbiam sprendimui, aš visada...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q7" value="5"/>
-      inicijuoju procesą, kurio metu sąmoningai kuriami keli nesuderinami scenarijai
-      (pvz., geriausias atvejis, blogiausias atvejis, neįtikėtinas atvejis), kad išvengčiau "tunelinio mąstymo"
-      ir parengčiau save staigiems pokyčiams.
-    </label>
-    <label class="option"><input type="radio" name="q7" value="2"/>
-      ieškau objektyvių duomenų, kurie padėtų man apsispręsti tarp dviejų akivaizdžių pasirinkimų.
-    </label>
-    <label class="option"><input type="radio" name="q7" value="3"/>
-      prašau komandos surinkti duomenis, kurie patvirtintų ir paneigtų mano pradinę idėją.
-    </label>
-    <label class="option"><input type="radio" name="q7" value="1"/>
-      ieškau įrodymų, kurie patvirtintų mano pradinę idėją ir požiūrį.
-    </label>
-    <label class="option"><input type="radio" name="q7" value="4"/>
-      ieškau aktyvių oponentų (žmonių su priešinga nuomone) ir prašau jų paruošti atsakomąjį pasiūlymą,
-      kad iššūkčiau savo prielaidoms.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q8 -->
-<fieldset class="question" data-dimension="Perframinimas" id="q8">
-  <legend class="q-title">8. Susidūrus su sudėtingu tikslu, aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q8" value="1"/>
-      naudoju tik tuos metodus ir įrankius, kuriuos jau esu išbandęs anksčiau ir žinau, kad veikia.
-    </label>
-    <label class="option"><input type="radio" name="q8" value="2"/>
-      naudoju populiariausius pramonės standartus (pvz., SWOT) analizei atlikti.
-    </label>
-    <label class="option"><input type="radio" name="q8" value="4"/>
-      ieškau visiškai nekonvencinių ir kūrybinių sprendimų, kurie gali atrodyti rizikingi, bet gali duoti didžiulę grąžą.
-    </label>
-    <label class="option"><input type="radio" name="q8" value="5"/>
-      aš manau, kad paties tikslo apibrėžimas gali būti klaidingas, todėl prieš dirbdamas bandau išsiaiškinti, koks yra tikrasis verslo poreikis už to tikslo, ir galbūt pakeisti kryptį.
-    </label>
-    <label class="option"><input type="radio" name="q8" value="3"/>
-      svarstau apie metodų adaptavimą iš kitų pramonės šakų (pvz., logistikos metodai IT projektui).
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q9 -->
-<fieldset class="question" data-dimension="Perframinimas" id="q9">
-  <legend class="q-title">9. Iškilo netikėta nauja problema. Aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q9" value="2"/>
-      bandau pritaikyti standartines organizacijos procedūras naujai problemai.
-    </label>
-    <label class="option"><input type="radio" name="q9" value="1"/>
-      gaištu laiką ieškodamas analogiškų problemų sprendimų savo patirtyje.
-    </label>
-    <label class="option"><input type="radio" name="q9" value="4"/>
-      sistemiškai ieškau sprendimų, kurie buvo sėkmingai taikomi visiškai skirtingose
-      pramonės šakose ar situacijose, kad atversčiau požiūrį.
-    </label>
-    <label class="option"><input type="radio" name="q9" value="3"/>
-      greitai pasitelkiu išorinius ekspertus, kad gaučiau patikrintą sprendimą.
-    </label>
-    <label class="option"><input type="radio" name="q9" value="5"/>
-      sistemiškai dekonstruoju problemą, nustatydamas visas prielaidas, ir tada
-      bandau jas išardyti arba apversti aukštyn kojomis (pvz., „O kas, jei mes
-      niekada neišspręsime šios problemos, bet tiesiog apeisime ją?“).
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q10 -->
-<fieldset class="question" data-dimension="Perframinimas" id="q10">
-  <legend class="q-title">10. Kai komanda generuoja idėjas, mano vaidmuo yra...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q10" value="2"/>
-      iš karto atmesti bet kokias idėjas, kurios atrodo per daug rizikingos.
-    </label>
-    <label class="option"><input type="radio" name="q10" value="1"/>
-      užtikrinti, kad idėjos būtų realistiškos ir atitiktų dabartinį biudžetą.
-    </label>
-    <label class="option"><input type="radio" name="q10" value="5"/>
-      paskirti vieną asmenį atstovauti „advokato velnio“ pozicijai, kuris visada privalo abejoti prielaidomis,
-      metodais ir tikslais, taip užtikrinant nuolatinį idėjos peržiūrėjimą.
-    </label>
-    <label class="option"><input type="radio" name="q10" value="3"/>
-      leisti generuoti laisvai, bet galiausiai pasirinkti geriausią iš akivaizdžių variantų.
-    </label>
-    <label class="option"><input type="radio" name="q10" value="4"/>
-      aktyviai paskatinti komandą generuoti idėjas, kurios prieštarautų dabartinei strategijai
-      ir atrodytų neįgyvendinamos per artimiausius metus.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q11 -->
-<fieldset class="question" data-dimension="Refleksija" id="q11">
-  <legend class="q-title">11. Po didelės sėkmės/nesėkmės, aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q11" value="5"/>
-      naudoju rezultatus kaip medžiagą asmeniniam strateginiam dienoraščiui, kad suformuluočiau naujas taisykles ar metodologijas (principus), kurios galėtų būti taikomos bet kurioje ateities situacijoje.
-    </label>
-    <label class="option"><input type="radio" name="q11" value="2"/>
-      surengiu trumpą susitikimą rezultatams aptarti ir padėkoti komandai.
-    </label>
-    <label class="option"><input type="radio" name="q11" value="1"/>
-      greitai einu prie kito darbo, nes praeitis neturi įtakos ateičiai.
-    </label>
-    <label class="option"><input type="radio" name="q11" value="4"/>
-      organizuoju struktūrizuotą peržiūrą, kurioje dokumentuojami ne tik rezultatai, bet ir sąlygos/prielaidos, kuriomis priėmėme sprendimus.
-    </label>
-    <label class="option"><input type="radio" name="q11" value="3"/>
-      parašau trumpą atmintinę apie pagrindines išmoktas pamokas, skirtą tik komandos nariams.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q12 -->
-<fieldset class="question" data-dimension="Refleksija" id="q12">
-  <legend class="q-title">12. Aš aktyviai ieškau kritinio grįžtamojo ryšio apie savo sprendimų priėmimo procesą...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q12" value="5"/>
-      iš nepriklausomų patarėjų ar vadovų iš kitų pramonės šakų, kad iššūkčiau savo įsitikinimams ir aptikčiau „akląsias zonas“ (angl. blind spots).
-    </label>
-    <label class="option"><input type="radio" name="q12" value="2"/>
-      tik iš tų asmenų, kuriais pasitikiu ir kurie neabejotinai palaiko mano sprendimus.
-    </label>
-    <label class="option"><input type="radio" name="q12" value="4"/>
-      iš platesnio suinteresuotųjų šalių rato, įskaitant tuos, kurie buvo nepatogūs ar su manimi nesutiko.
-    </label>
-    <label class="option"><input type="radio" name="q12" value="1"/>
-      tik tada, kai man jo prašo.
-    </label>
-    <label class="option"><input type="radio" name="q12" value="3"/>
-      iš savo tiesioginių pavaldinių ir vadovų.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q13 -->
-<fieldset class="question" data-dimension="Refleksija" id="q13">
-  <legend class="q-title">13. Kai analizuoju praeities klaidas, aš visų pirma ieškau...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q13" value="3"/>
-      pamokų, kurios padėtų išvengti tų pačių klaidų ateityje.
-    </label>
-    <label class="option"><input type="radio" name="q13" value="1"/>
-      klaidų padariusių asmenų, kad galėčiau užtikrinti atsakomybę.
-    </label>
-    <label class="option"><input type="radio" name="q13" value="4"/>
-      prielaidų, kuriomis buvo remiamasi priimant sprendimus, kad išmokčiau atpažinti klaidingas prielaidas anksčiau.
-    </label>
-    <label class="option"><input type="radio" name="q13" value="5"/>
-      kaip šios klaidos atspindi platesnes organizacines tendencijas ar kultūrines spragas, ir bandau sukurti ilgalaikę mokymosi sistemą organizacijoje.
-    </label>
-    <label class="option"><input type="radio" name="q13" value="2"/>
-      akivaizdžių sistemų trūkumų, kad juos greitai pataisyčiau.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q14 -->
-<fieldset class="question" data-dimension="Refleksija" id="q14">
-  <legend class="q-title">14. Mano nuomonė apie strategijos keitimą (perplanavimą) yra...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q14" value="4"/>
-      kad strategija turi būti nuolat peržiūrima, bet pakeitimai turėtų būti daromi tik po išsamios analizės.
-    </label>
-    <label class="option"><input type="radio" name="q14" value="1"/>
-      kad tai rodo silpnumą ir neapgalvotą pradinį planą, todėl stengiuosi laikytis pirminio plano.
-    </label>
-    <label class="option"><input type="radio" name="q14" value="3"/>
-      kad planą galima keisti, bet tik metų pabaigoje, kad išvengtume chaoso.
-    </label>
-    <label class="option"><input type="radio" name="q14" value="2"/>
-      kad keisti reikia tik tada, kai pasiekiami blogi rezultatai.
-    </label>
-    <label class="option"><input type="radio" name="q14" value="5"/>
-      kad strateginis planavimas yra nuolatinė mokymosi funkcija, todėl, gavus naujų duomenų ar atradus naują perspektyvą, pakeitimas turi būti inicijuojamas nedelsiant, net jei tai sukelia trumpalaikį nepatogumą.
-    </label>
-  </div>
-</fieldset>
-
-<!-- Q15 -->
-<fieldset class="question" data-dimension="Refleksija" id="q15">
-  <legend class="q-title">15. Priėmęs svarbų sprendimą, kuris pasirodė sėkmingas, aš...</legend>
-  <div class="options">
-    <label class="option"><input type="radio" name="q15" value="4"/>
-      dokumentuoju sėkmės istoriją ir nustatau, kokios vidinės/išorinės sąlygos turi būti pakartotos kituose projektuose.
-    </label>
-    <label class="option"><input type="radio" name="q15" value="1"/>
-      tiesiog džiaugiuosi sėkme ir imuosi kito projekto.
-    </label>
-    <label class="option"><input type="radio" name="q15" value="5"/>
-      išvedu bendrą principą (metareglamentą) iš tos sėkmės ir bandau jį pritaikyti visiškai skirtingose situacijose (ne tik panašiuose projektuose), kad patikrinčiau jo universalumą.
-    </label>
-    <label class="option"><input type="radio" name="q15" value="3"/>
-      analizuoju, kurie veiksmai atvedė prie sėkmės.
-    </label>
-    <label class="option"><input type="radio" name="q15" value="2"/>
-      greitai pasidalinu pamoka apie sėkmę su kolegomis.
-    </label>
-  </div>
-</fieldset>
-
+  <header>
+    <div class="wrap">
+      <h1>Strateginio mąstymo testas (STQ)</h1>
+      <span class="muted" id="answeredInfo">Atsakyta: 0/15</span>
     </div>
+  </header>
 
-    <div class="actions">
-      <button type="button" class="primary">Pateikti atsakymus</button>
-      <button type="button" id="resetBtn" class="secondary">Išvalyti</button>
-      
-<!-- Mygtukas PDF atsisiuntimui -->
-<button type="button" id="downloadPDF" class="secondary">Atsisiųsti PDF</button>
+  <main>
+    <section class="card intro">
+      <p><strong>Instrukcija:</strong> Pasirinkite vieną atsakymą, kuris tiksliausiai atspindi Jūsų įprastą veiksmą tokioje situacijoje.</p>
+      <div class="progress" aria-label="Progresas"><span id="bar"></span></div>
+    </section>
 
-      <span id="error" class="error"></span>
-    </div>
-  </form>
+    <!-- Forma su klausimais -->
+    <form id="stqForm" class="card" novalidate>
+      <div id="questions"></div>
+      <div class="actions">
+        <button type="button" class="primary" id="submitBtn">Pateikti atsakymus</button>
+        <button type="button" class="ghost" id="saveBtn">Išsaugoti naršyklėje</button>
+        <button type="button" class="warn" id="loadBtn">Atkurti iš naršyklės</button>
+        <button type="button" class="ghost" onclick="window.print()">Spausdinti / PDF</button>
+        <button type="button" class="danger" id="clearBtn">Išvalyti</button>
+      </div>
+    </form>
 
-<!-- Rezultatų sekcija -->
-<section id="result" class="result" style="display:none;">
-  <div class="card">
-    <h2>Rezultatai</h2>
-    <p id="overallScore"></p>
-    <div id="overallBadge" class="pill"></div>
-    <p id="overallText"></p>
-    <div class="bar-wrap">
-      <div class="bar" id="barSys" style="width:0%"></div>
-      <div class="bar-label"><span>Sisteminis mąstymas</span><span id="labelSys">0/25</span></div>
-      <div class="bar" id="barReframe" style="width:0%; margin-top:8px"></div>
-      <div class="bar-label"><span>Perframinimas</span><span id="labelReframe">0/25</span></div>
-      <div class="bar" id="barReflect" style="width:0%; margin-top:8px"></div>
-      <div class="bar-label"><span>Refleksija</span><span id="labelReflect">0/25</span></div>
-    </div>
-    <ul id="tips"></ul>
-    <ul id="dimInterpret"></ul>
-  </div>
-</section>
+    <!-- Rezultatai -->
+    <section class="card" id="results" aria-live="polite">
+      <div class="grid">
+        <div class="kpi"><h4>Sisteminis mąstymas</h4><div class="muted" id="sysScore">0/25</div></div>
+        <div class="kpi"><h4>Perframinimas</h4><div class="muted" id="refrScore">0/25</div></div>
+        <div class="kpi"><h4>Refleksija</h4><div class="muted" id="reflScore">0/25</div></div>
+      </div>
+    </section>
+  </main>
 
-<!-- Mygtukai -->
-<div style="margin-top:20px;">
-  <button id="submitBtn" type="button">Pateikti atsakymus</button>
-  <button id="clearBtn" type="button">Išvalyti atsakymus</button>
-  <button id="downloadPDF" type="button">Atsisiųsti PDF</button>
-</div>
-
-<!-- Biblioteka PDF -->
-https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js</script>
-
+  <footer>
+    <small>© 2025 STQ | Sukurta Oleg Mozochin („GitHub Pages“). Veikia be serverio, duomenys saugomi tik naršyklėje.</small>
+  </footer>
 
 <script>
+/* Klausimų duomenys su balais pagal Document.docx (kiekvieno pasirinkimo balai) */
+const data = [
+  // I. Sisteminis mąstymas (Q1–Q5)
+  { group:'Sisteminis mąstymas', text:'1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...', opts:[
+    'naudoju formalią matrica, kad įvertinčiau tiesioginį poveikį visiems susijusiems skyriams...',
+    'visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą...',
+    'analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei...',
+    'paklausiu kelių kitų skyrių vadovų nuomonės...',
+    'atsižvelgiu į gretimų skyrių prieštaravimus...'
+  ], scores:[4,1,5,3,2] }, /* balai pagal docx */  /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
 
+  { group:'Sisteminis mąstymas', text:'2. Susidūrus su klientų praradimu, aš...', opts:[
+    'analizuoju ne tik vidinius procesus, bet ir išorinius rinkos pokyčius...',
+    'peržiūriu paskutinių savaičių pardavimų ataskaitas...',
+    'iš karto kaltinu pardavimų skyrių...',
+    'stengiuosi atsekti vidines klaidas...',
+    'peržiūriu tiek pardavimų, tiek produktų kokybės duomenis...'
+  ], scores:[5,2,1,4,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
 
+  { group:'Sisteminis mąstymas', text:'3. Mano požiūris į ilgalaikes makro tendencijas...', opts:[
+    'perskaitau naujienas, bet tai neturi įtakos...',
+    'reguliariai inicijuoju scenarijų planavimą (5 metų horizontas)...',
+    'tai aukščiausios vadovybės reikalas...',
+    'kartais diskutuoju, bet neturiu proceso...',
+    'nuolat stebiu ir peržiūriu prioritetus kas ketvirtį.'
+  ], scores:[2,5,1,3,4] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Sisteminis mąstymas', text:'4. Kai iškyla problemos, viršijančios skyriaus kompetenciją, aš...', opts:[
+    'bandau spręsti tik savo resursais...',
+    'sistemiškai ieškau pasikartojančios organizacinės priežasties...',
+    'perduodu atsakomybę aukštesnei vadovybei...',
+    'bendradarbiauju su 1–2 skyriais...',
+    'inicijuoju tarpfunkcinį susitikimą...'
+  ], scores:[2,5,1,3,4] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Sisteminis mąstymas', text:'5. Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...', opts:[
+    'kritinėms prielaidoms ir planams B',
+    'išteklių paskirstymui',
+    'tikslams pagal praėjusių metų rezultatus',
+    'įvairioms rizikoms ir galimybėms',
+    'konkurenciniam pranašumui iki 1 metų'
+  ], scores:[5,2,1,4,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  // II. Perframinimas (Q6–Q10)
+  { group:'Perframinimas', text:'6. Komandai nepavykstant įveikti kliūties, aš...', opts:[
+    'sustabdau ir suformuluoju 5 alternatyvius problemos apibrėžimus',
+    'dirbtuvės „ką darytų konkurentas/klientas“',
+    'prašau 3–4 naujų, bet panašių planų',
+    'primenu naudoti patvirtintas taktikas',
+    'inicijuoju diskusiją ir radikaliai kitokias idėjas'
+  ], scores:[4,5,2,1,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Perframinimas', text:'7. Ruošiantis svarbiam sprendimui, aš visada...', opts:[
+    'kuriu kelis nesuderinamus scenarijus (geriausias/blogiausias/neįtikėtinas)',
+    'ieškau objektyvių duomenų tarp dviejų pasir.',
+    'prašau duomenų, kurie patvirtintų ir paneigtų idėją',
+    'ieškau tik patvirtinančių įrodymų',
+    'ieškau aktyvių oponentų su atsakomuoju pasiūlymu'
+  ], scores:[5,2,3,1,4] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Perframinimas', text:'8. Susidūrus su sudėtingu tikslu, aš...', opts:[
+    'naudoju tik jau išbandytus metodus',
+    'naudoju populiarius standartus (pvz., SWOT)',
+    'ieškau nekonvencinių ir kūrybinių sprendimų',
+    'peržiūriu tikrąjį verslo poreikį už tikslo',
+    'adaptuoju metodus iš kitų pramonės šakų'
+  ], scores:[1,2,4,5,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Perframinimas', text:'9. Iškilus netikėtai problemai, aš...', opts:[
+    'taikau standartines procedūras',
+    'ieškau analogijų savo patirtyje',
+    'ieškau sprendimų iš kitų industrijų',
+    'pasitelkiu išorinius ekspertus',
+    'dekonstruoju prielaidas ir bandau jas apversti'
+  ], scores:[2,1,4,3,5] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Perframinimas', text:'10. Kai komanda generuoja idėjas, mano vaidmuo yra...', opts:[
+    'atmesti rizikingas idėjas',
+    'užtikrinti realistiškumą pagal biudžetą',
+    'paskirti „advokato velnio“ rolę',
+    'laisva generacija, o gale pasirenku akivaizdžiausią',
+    'skatinti idėjas, prieštaraujančias dabartinei strategijai'
+  ], scores:[2,1,5,3,4] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  // III. Refleksija (Q11–Q15)
+  { group:'Refleksija', text:'11. Po didelės sėkmės/nesėkmės, aš...', opts:[
+    'naudojau rezultatus strateginiam dienoraščiui (principai)',
+    'surengiu trumpą aptarimą ir padėką',
+    'greitai einu prie kito darbo',
+    'struktūrizuota peržiūra su prielaidomis',
+    'trumpa atmintinė komandos nariams'
+  ], scores:[5,2,1,4,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Refleksija', text:'12. Aš aktyviai ieškau kritinio grįžtamojo ryšio...', opts:[
+    'iš nepriklausomų patarėjų iš kitų industrijų',
+    'tik iš palaikančių asmenų',
+    'iš platesnio suinteresuotųjų rato',
+    'tik tada, kai man jo prašo',
+    'iš tiesioginių pavaldinių ir vadovų'
+  ], scores:[5,2,4,1,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Refleksija', text:'13. Analizuodamas praeities klaidas, ieškau...', opts:[
+    'pamokų ateičiai',
+    'kaltų asmenų',
+    'klaidingų prielaidų atpažinimo',
+    'organizacinių tendencijų ir mokymosi sistemos',
+    'akivaizdžių sistemų trūkumų'
+  ], scores:[3,1,4,5,2] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Refleksija', text:'14. Mano nuomonė apie strategijos keitimą yra...', opts:[
+    'nuolat peržiūrėti, bet keisti po analizės',
+    'keisti rodo silpnumą',
+    'keisti tik metų pabaigoje',
+    'keisti tik prie blogų rezultatų',
+    'keisti nedelsiant gavus naujų duomenų'
+  ], scores:[4,1,3,2,5] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+
+  { group:'Refleksija', text:'15. Sėkmingo sprendimo atveju, aš...', opts:[
+    'dokumentuoju sąlygas pakartojimui',
+    'džiaugiuosi ir einu toliau',
+    'išvedu bendrą principą ir tikrinu kitur',
+    'analizuoju, kurie veiksmai lėmė sėkmę',
+    'greitai pasidalinu pamoka'
+  ], scores:[4,1,5,3,2] } /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
+];
+
+const container = document.getElementById('questions');
 const form = document.getElementById('stqForm');
-const errorEl = document.getElementById('error');
-const resultEl = document.getElementById('result');
-const progressEl = document.getElementById('progress');
-const TOTAL_Q = 15;
 
-// Progress counter
-function updateProgress() {
-  const answered = [...Array(TOTAL_Q)].map((_, i) => `q${i + 1}`)
-    .filter(id => form.querySelector(`input[name="${id}"]:checked`)).length;
-  progressEl.textContent = `Atsakyta: ${answered}/${TOTAL_Q}`;
-}
+function render(){
+  container.innerHTML = '';
+  data.forEach((q, i)=>{
+    const wrap = document.createElement('div'); wrap.className = 'q';
+    const groupTitle = document.createElement('div'); groupTitle.className = 'group-title'; groupTitle.textContent = q.group; wrap.appendChild(groupTitle);
+    const h3 = document.createElement('h3'); h3.textContent = q.text; wrap.appendChild(h3);
+    const choices = document.createElement('div'); choices.className = 'choices';
 
-form.addEventListener('change', updateProgress);
+    q.opts.forEach((opt, j)=>{
+      const id = `q${i}_o${j}`;
+      const label = document.createElement('label');
+      const input = document.createElement('input'); input.type='radio'; input.name=`q${i}`; input.value=j; input.id=id; input.addEventListener('change', updateProgress);
+      const span = document.createElement('span'); span.textContent = opt;
+      label.htmlFor = id; label.appendChild(input); label.appendChild(span);
+      choices.appendChild(label);
+    });
 
-// Interpretacija pagal bendrą balą
-function interpret(total) {
-  if (total >= 60) return { label: 'Aukštas strateginio mąstymo lygis', cls: 'good', text: 'Turite tvirtus sisteminio mąstymo, perframinimo ir refleksijos raumenis. Galite vesti per pokytį ir kompleksiškumą.' };
-  if (total >= 45) return { label: 'Vidutinis lygis', cls: 'mid', text: 'Baziniai gebėjimai yra. Koncentruokitės į krypties aiškinimą, prielaidų tikrinimą ir nuolatinę mokymosi discipliną.' };
-  return { label: 'Žemas lygis', cls: 'bad', text: 'Dominuoja operatyvumas. Rekomenduojama stiprinti sistemos matymą, alternatyvų kūrimą ir AAR/PDCA ritmą.' };
-}
-
-// Greitos rekomendacijos
-function dimTips(scores) {
-  const tips = [];
-  if (scores['Sisteminis mąstymas'] < 15) tips.push('• Sukurkite vertės grandinės žemėlapį ir nustatykite poveikio svertus tarp padalinių.');
-  if (scores['Perframinimas'] < 15) tips.push('• Naudokite sąmoningą scenarijų portfelį (geriausias/blogiausias/neįtikėtinas) ir „advokato velnią“.');
-  if (scores['Refleksija'] < 15) tips.push('• Įdiekite AAR/PDCA ciklą su prielaidų dokumentavimu ir kritiniu grįžtamuoju ryšiu.');
-  if (tips.length === 0) tips.push('• Išlaikykite discipliną: scenarijai, prielaidų testavimas, AAR/PDCA, ir kryžminis poveikio analizavimas.');
-  return tips;
-}
-
-// Detalios interpretacijos pagal dimensijas
-function dimInterpret(scores) {
-  const interpretations = [];
-  // Sisteminis mąstymas
-  if (scores['Sisteminis mąstymas'] >= 20) {
-    interpretations.push('Sisteminis mąstymas: Aukštas – Matote ryšius tarp padalinių ir vertės grandinės, gebate planuoti ilgalaikę kryptį.');
-  } else if (scores['Sisteminis mąstymas'] >= 15) {
-    interpretations.push('Sisteminis mąstymas: Vidutinis – Gebate analizuoti procesus, bet reikia stiprinti poveikio svertus.');
-  } else {
-    interpretations.push('Sisteminis mąstymas: Žemas – Dominuoja lokalus požiūris; kurkite sisteminius scenarijus ir vertės grandinės žemėlapius.');
-  }
-
-  // Perframinimas
-  if (scores['Perframinimas'] >= 20) {
-    interpretations.push('Perframinimas: Aukštas – Efektyviai kuriate alternatyvas, scenarijus ir iššaukiate prielaidas.');
-  } else if (scores['Perframinimas'] >= 15) {
-    interpretations.push('Perframinimas: Vidutinis – Kartais peržiūrite prielaidas, bet trūksta radikalių požiūrio pokyčių.');
-  } else {
-    interpretations.push('Perframinimas: Žemas – Sprendimai dažnai remiasi įprastomis taktikomis; lavinkite scenarijų portfelį ir „advokato velnio“ metodą.');
-  }
-
-  // Refleksija
-  if (scores['Refleksija'] >= 20) {
-    interpretations.push('Refleksija: Aukštas – Nuosekliai dokumentuojate pamokas, ieškote grįžtamojo ryšio ir prielaidų analizės.');
-  } else if (scores['Refleksija'] >= 15) {
-    interpretations.push('Refleksija: Vidutinis – Mokotės iš patirties, bet trūksta sisteminio AAR/PDCA ciklo.');
-  } else {
-    interpretations.push('Refleksija: Žemas – Pamokos lieka paviršutiniškos; rekomenduojama įdiegti struktūrizuotą peržiūrą ir prielaidų dokumentavimą.');
-  }
-
-  return interpretations;
-}
-
-// Submit event
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  errorEl.textContent = '';
-
-  // Validacija
-  for (let i = 1; i <= TOTAL_Q; i++) {
-    if (!form.querySelector(`input[name="q${i}"]:checked`)) {
-      errorEl.textContent = `Neatsakyta į klausimą Nr. ${i}`;
-      form.querySelector(`#q${i}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-  }
-
-  // Skaičiavimas
-  const scores = { 'Sisteminis mąstymas': 0, 'Perframinimas': 0, 'Refleksija': 0 };
-  let total = 0;
-  for (let i = 1; i <= TOTAL_Q; i++) {
-    const val = Number(form.querySelector(`input[name="q${i}"]:checked`).value);
-    const dim = form.querySelector(`#q${i}`).dataset.dimension;
-    scores[dim] += val;
-    total += val;
-  }
-
-  // Bendras balas
-  document.getElementById('overallScore').textContent = `Bendras balas: ${total}/75`;
-  const itp = interpret(total);
-  const badge = document.getElementById('overallBadge');
-  badge.className = `pill ${itp.cls}`;
-  badge.textContent = itp.label;
-  document.getElementById('overallText').textContent = itp.text;
-
-  // Progress bar
-  const pct = x => Math.round((x / 25) * 100);
-  document.getElementById('barSys').style.width = pct(scores['Sisteminis mąstymas']) + '%';
-  document.getElementById('labelSys').textContent = `${scores['Sisteminis mąstymas']}/25`;
-  document.getElementById('barReframe').style.width = pct(scores['Perframinimas']) + '%';
-  document.getElementById('labelReframe').textContent = `${scores['Perframinimas']}/25`;
-  document.getElementById('barReflect').style.width = pct(scores['Refleksija']) + '%';
-  document.getElementById('labelReflect').textContent = `${scores['Refleksija']}/25`;
-
-  // Rekomendacijos
-  const tips = dimTips(scores);
-  const ulTips = document.getElementById('tips');
-  ulTips.innerHTML = '';
-  tips.forEach(t => {
-    const li = document.createElement('li');
-    li.textContent = t;
-    ulTips.appendChild(li);
+    wrap.appendChild(choices);
+    container.appendChild(wrap);
   });
+}
+render();
 
-  // Detalios interpretacijos
-  const dimUl = document.getElementById('dimInterpret');
-  if (dimUl) {
-    dimUl.innerHTML = '';
-    dimInterpret(scores).forEach(text => {
-      const li = document.createElement('li');
-      li.textContent = text;
-      dimUl.appendChild(li);
-    });
+/* Progresas */
+function answeredCount(){
+  let cnt=0; data.forEach((_,i)=>{ if(form.querySelector(`input[name=q${i}]:checked`)) cnt++; });
+  return cnt;
+}
+function updateProgress(){
+  const cnt = answeredCount();
+  document.getElementById('answeredInfo').textContent = `Atsakyta: ${cnt}/15`;
+  document.getElementById('bar').style.width = `${(cnt/15)*100}%`;
+}
+
+/* Skaičiavimas (balai pagal scores masyvą) */
+function compute(){
+  let sys=0, refr=0, refl=0;
+  let allAnswered=true;
+  data.forEach((q,i)=>{
+    const chosen = form.querySelector(`input[name=q${i}]:checked`);
+    if(!chosen){ allAnswered=false; return; }
+    const val = Number(chosen.value);
+    const score = q.scores[val]; // balas pagal dokumentą
+    if(q.group==='Sisteminis mąstymas') sys += score;
+    else if(q.group==='Perframinimas') refr += score;
+    else refl += score;
+  });
+  return {sys, refr, refl, allAnswered};
+}
+
+/* Rezultatų atvaizdavimas */
+function showResults(){
+  const {sys, refr, refl, allAnswered} = compute();
+  if(!allAnswered){
+    alert('Užpildykite visus klausimus prieš pateikdami atsakymus.');
+    return;
   }
+  document.getElementById('sysScore').textContent = `${sys}/25`;
+  document.getElementById('refrScore').textContent = `${refr}/25`;
+  document.getElementById('reflScore').textContent = `${refl}/25`;
+}
 
-  resultEl.style.display = 'block';
-  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
+/* Išsaugojimas naršyklėje */
+function save(){
+  const answers = data.map((_,i)=>{
+    const chosen = form.querySelector(`input[name=q${i}]:checked`);
+    return chosen? Number(chosen.value) : null;
+  });
+  localStorage.setItem('stq_answers', JSON.stringify(answers));
+  alert('Atsakymai išsaugoti naršyklėje.');
+}
+function load(){
+  const raw = localStorage.getItem('stq_answers');
+  if(!raw){ alert('Nerasta išsaugotų atsakymų.'); return; }
+  const answers = JSON.parse(raw);
+  answers.forEach((val,i)=>{
+    if(val===null) return;
+    const el = form.querySelector(`input[name=q${i}][value="${val}"]`);
+    if(el){ el.checked = true; }
+  });
+  updateProgress();
+  alert('Atsakymai atkurti iš naršyklės.');
+}
+function clearAll(){
+  form.reset();
+  updateProgress();
+  document.getElementById('sysScore').textContent = '0/25';
+  document.getElementById('refrScore').textContent = '0/25';
+  document.getElementById('reflScore').textContent = '0/25';
+}
 
+/* Mygtukų logika */
+document.getElementById('submitBtn').addEventListener('click', showResults);
+document.getElementById('saveBtn').addEventListener('click', save);
+document.getElementById('loadBtn').addEventListener('click', load);
+document.getElementById('clearBtn').addEventListener('click', clearAll);
 
-document.getElementById('downloadPDF').addEventListener('click', () => {
-    const element = document.querySelector('body'); // arba konkretus div su testu
-    const options = {
-        margin: 10,
-        filename: 'Strateginio_mąstymo_testas.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(options).from(element).save();
-});
-    
-document.querySelectorAll('input[type="radio"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        localStorage.setItem(radio.name, radio.value);
-    });
-});
-
-
-script src="https://cdnjs.cloudflare.com/ajax/libs/html/html2pdf.bundle.min.js</script> 
+/* Pradinė būsena */
+updateProgress();
 </script>
-
-<!-- PDF biblioteka -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdfl2pdf.bundle.min.js</script>
-
-<script>
-// PDF atsisiuntimas
-document.getElementById('downloadPDF').addEventListener('click', () => {
-    const element = document.querySelector('body'); // arba konkretus div su testu
-    const options = {
-        margin: 10,
-        filename: 'Strateginio_mąstymo_testas.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(options).from(element).save();
-});
-
-// Atsakymų išsaugojimas
-document.querySelectorAll('input[type="radio"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        localStorage.setItem(radio.name, radio.value);
-    });
-});
-
-// Atkūrimas po perkrovimo
-window.addEventListener('load', () => {
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        if (localStorage.getItem(radio.name) === radio.value) {
-            radio.checked = true;
-        }
-    });
-});
-</script>
-
 </body>
 </html>
-
