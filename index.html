@@ -74,14 +74,36 @@
       </div>
     </form>
 
-    <!-- Rezultatai -->
-    <section class="card" id="results" aria-live="polite">
-      <div class="grid">
-        <div class="kpi"><h4>Sisteminis mąstymas</h4><div class="muted" id="sysScore">0/25</div></div>
-        <div class="kpi"><h4>Perframinimas</h4><div class="muted" id="refrScore">0/25</div></div>
-        <div class="kpi"><h4>Refleksija</h4><div class="muted" id="reflScore">0/25</div></div>
-      </div>
-    </section>
+  
+<!-- Rezultatai -->
+<section class="card" id="results" aria-live="polite">
+  <div class="grid">
+    <div class="kpi">
+      <h4>Sisteminis mąstymas</h4>
+      <div class="muted" id="sysScore">0/25</div>
+      <!-- Žodinis vertinimas + patarimai -->
+      <div class="interp" id="sysInterp"></div>
+    </div>
+    <div class="kpi">
+      <h4>Perframinimas</h4>
+      <div class="muted" id="refrScore">0/25</div>
+      <div class="interp" id="refrInterp"></div>
+    </div>
+    <div class="kpi">
+      <h4>Refleksija</h4>
+      <div class="muted" id="reflScore">0/25</div>
+      <div class="interp" id="reflInterp"></div>
+    </div>
+  </div>
+
+  <!-- Bendras -->
+  <div class="total">
+    <h4>Bendras rezultatas</h4>
+    <div class="muted" id="totalScore">0/75</div>
+    <div class="interp" id="totalInterp"></div>
+  </div>
+</section>
+
   </main>
 
   <footer>
