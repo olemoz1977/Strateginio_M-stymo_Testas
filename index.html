@@ -132,7 +132,7 @@ const data = [
 
   { group:'Sisteminis mąstymas', text:'3. Mano požiūris į ilgalaikes makro tendencijas...', opts:[
     'perskaitau naujienas, bet tai neturi įtakos...',
-    'reguliariai inicijuoju scenarijų planavimą (5 metų horizontas)...',
+    'reguliariai inicijuoju scenarijų planavimą (3-5 metų horizontas)...',
     'tai aukščiausios vadovybės reikalas...',
     'kartais diskutuoju, bet neturiu proceso...',
     'nuolat stebiu ir peržiūriu prioritetus kas ketvirtį.'
@@ -157,16 +157,16 @@ const data = [
   // II. Perframinimas (Q6–Q10)
   { group:'Perframinimas', text:'6. Komandai nepavykstant įveikti kliūties, aš...', opts:[
     'sustabdau ir suformuluoju 5 alternatyvius problemos apibrėžimus',
-    'dirbtuvės „ką darytų konkurentas/klientas“',
+    'inicijuoju dirbtuvės „ką darytų konkurentas/klientas“',
     'prašau 3–4 naujų, bet panašių planų',
     'primenu naudoti patvirtintas taktikas',
-    'inicijuoju diskusiją ir radikaliai kitokias idėjas'
+    'inicijuoju komandos diskusiją apie radikaliai kitokias idėjas'
   ], scores:[4,5,2,1,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
 
   { group:'Perframinimas', text:'7. Ruošiantis svarbiam sprendimui, aš visada...', opts:[
     'kuriu kelis nesuderinamus scenarijus (geriausias/blogiausias/neįtikėtinas)',
-    'ieškau objektyvių duomenų tarp dviejų pasir.',
-    'prašau duomenų, kurie patvirtintų ir paneigtų idėją',
+    'ieškau objektyvių duomenų tarp dviejų pasirinkimų',
+    'prašau duomenų, kurie patvirtintų arba paneigtų idėją',
     'ieškau tik patvirtinančių įrodymų',
     'ieškau aktyvių oponentų su atsakomuoju pasiūlymu'
   ], scores:[5,2,3,1,4] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
@@ -190,25 +190,25 @@ const data = [
   { group:'Perframinimas', text:'10. Kai komanda generuoja idėjas, mano vaidmuo yra...', opts:[
     'atmesti rizikingas idėjas',
     'užtikrinti realistiškumą pagal biudžetą',
-    'paskirti „advokato velnio“ rolę',
+    'pasirinkti „velnio advokato “ rolę',
     'laisva generacija, o gale pasirenku akivaizdžiausią',
     'skatinti idėjas, prieštaraujančias dabartinei strategijai'
   ], scores:[2,1,5,3,4] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
 
   // III. Refleksija (Q11–Q15)
   { group:'Refleksija', text:'11. Po didelės sėkmės/nesėkmės, aš...', opts:[
-    'naudojau rezultatus strateginiam dienoraščiui (principai)',
+    'naudoju rezultatus strateginiam dienoraščiui (principai)',
     'surengiu trumpą aptarimą ir padėką',
     'greitai einu prie kito darbo',
-    'struktūrizuota peržiūra su prielaidomis',
-    'trumpa atmintinė komandos nariams'
+    ' darau struktūrizuota peržiūra su prielaidomis',
+    ' paruošiu trumpa atmintinė komandos nariams'
   ], scores:[5,2,1,4,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
 
   { group:'Refleksija', text:'12. Aš aktyviai ieškau kritinio grįžtamojo ryšio...', opts:[
     'iš nepriklausomų patarėjų iš kitų industrijų',
     'tik iš palaikančių asmenų',
     'iš platesnio suinteresuotųjų rato',
-    'tik tada, kai man jo prašo',
+    'tik tada, kai man jo reikia'
     'iš tiesioginių pavaldinių ir vadovų'
   ], scores:[5,2,4,1,3] }, /* [1](https://lietpaklt-my.sharepoint.com/personal/oleg_mozochin_lietpak_com/_layouts/15/Doc.aspx?sourcedoc=%7B13E9AD02-B3C7-493B-87A9-F776DACF0809%7D&file=Document.docx&action=default&mobileredirect=true) */
 
@@ -293,10 +293,10 @@ function adviceForDomain(domain, score){
       Pažengęs: 'Išlaikyk sistemines peržiūras ir kritinių prielaidų auditą kas ketvirtį.',
       Tvirtas: 'Įvesk nuolatinį scenarijų planavimą ir vertės grandinės peržiūras per sprintus.',
       Augantis: 'Pradėk nuo prielaidų žemėlapio ir tarp-funkcinių sesijų su aiškiomis sąsajomis.',
-      Pradinis: 'Sukurk bazinį „sistemos schemą“: procesai → sąsajos → rizikos → sprendimų taisyklės.'
+      Pradinis: 'Sukurk bazinę „sistemos schemą“: procesai → sąsajos → rizikos → sprendimų taisyklės.'
     },
     'Perframinimas': {
-      Pažengęs: 'Nuolat naudok „advokato velnio“ rolę ir nekonvencinių idėjų sėklas prieš sprendimą.',
+      Pažengęs: 'Nuolat naudok „velnio advokato“ rolę ir nekonvencinių idėjų sėklas prieš sprendimą.',
       Tvirtas: 'Įtrauk 3 alternatyvius problemos apibrėžimus ir oponentų pasiūlymą kiekvienam svarbiam sprendimui.',
       Augantis: 'Pradėk nuo „ką darytų klientas/konkurentas?“ dirbtuvių ir analogijų iš kitų industrijų.',
       Pradinis: 'Venk tunelinio mąstymo: bent 2 skirtingi scenarijai ir 1 „neįtikėtinas“ variantas.'
@@ -356,7 +356,7 @@ function showResults(){
     Pažengęs: 'Bendras lygis aukštas — gali vesti strategines sesijas ir diegti organizacinius principus.',
     Tvirtas: 'Tvirta strateginė bazė — sutelk dėmesį į nuoseklumą ir prielaidų auditą kiekviename cikle.',
     Augantis: 'Augimo stadija — standartizuok refleksiją ir perframingą, kad išvengtum tunelinio mąstymo.',
-    Pradinis: 'Pradinė stadija — pradėk nuo mažų ritualų: 2 scenarijai, AAR po kiekvieno projekto, „advokato velnio“ rolė.'
+    Pradinis: 'Pradinė stadija — pradėk nuo mažų ritualų: 2 scenarijai, AAR po kiekvieno projekto, „velnio advokato“ rolė.'
   }[totalLabel];
 
   document.getElementById('totalInterp').textContent = `${totalLabel}. ${totalInterp}`;
