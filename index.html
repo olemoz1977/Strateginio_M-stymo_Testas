@@ -246,13 +246,51 @@ function answeredCount(){
   let cnt=0; data.forEach((_,i)=>{ if(form.querySelector(`input[name=q${i}]:checked`)) cnt++; });
   return cnt;
 }
+
+<script>
+/* ... (palik data[], render(), answeredCount() kaip aukščiau) ... */
+
 function updateProgress(){
   const cnt = answeredCount();
   document.getElementById('answeredInfo').textContent = `Atsakyta: ${cnt}/15`;
   document.getElementById('bar').style.width = `${(cnt/15)*100}%`;
 }
 
-/* Skaičiavimas (balai pagal scores masyvą) */
+/* Interpretacijų žymės */
+function labelForScore(score){
+  if (score >= 20) return 'Pažengęs';
+  if (score >= 15) return 'Tvirtas';
+  if (score >= 10) return 'Augantis';
+  return 'Pradinis';
+}
+
+/* Srities rekomendacijos (trumpos) */
+function adviceForDomain(domain, score){
+  const level = labelForScore(score);
+  const map = {
+    'Sisteminis mąstymas': {
+      Pažengęs: 'Išlaikyk sistemines peržiūras ir kritinių prielaidų auditą kas ketvirtį.',
+      Tvirtas: 'Įvesk nuolatinį scenarijų planavimą ir vertės grandinės peržiūras per sprintus.',
+      Augantis: 'Pradėk nuo prielaidų žemėlapio ir tarp-funkcinių sesijų su aiškiomis sąsajomis.',
+      Pradinis: 'Sukurk bazinį „sistemos schemą“: procesai → sąsajos → rizikos → sprendimų taisyklės.'
+    },
+    'Perframinimas': {
+      Pažengęs: 'Nuolat naudok „advokato velnio“ rolę ir nekonvencinių idėjų sėklas prieš sprendimą.',
+      Tvirtas: 'Įtrauk 3 alternatyvius problemos apibrėžimus ir oponentų pasiūlymą kiekvienam svarbiam sprendimui.',
+      Augantis: 'Pradėk nuo „ką darytų klientas/konkurentas?“ dirbtuvių ir analogijų iš kitų industrijų.',
+      Pradinis: 'Venk tunelinio mąstymo: bent 2 skirtingi scenarijai ir 1 „neįtikėtinas“ variantas.'
+    },
+    'Refleksija': {
+      Pažengęs: 'Fiksuok principus/metareglementus ir testuok juos kitose situacijose (transferabilumas).',
+      Tvirtas: 'Įdiek sisteminę AAR (After Action Review) su prielaidų dokumentavimu.',
+      Augantis: 'Kiekvienam projektui rašyk „pamokų“ santrauką ir planuok kitą eksperimentą.',
+      Pradinis: 'Po kiekvieno ciklo skirk 20 min. refleksijai: kas pavyko/ne, kokios prielaidos buvo klaidingos.'
+    }
+  };
+  return map[domain][level];
+}
+
+/* Skaičiavimas */
 function compute(){
   let sys=0, refr=0, refl=0;
   let allAnswered=true;
@@ -265,19 +303,42 @@ function compute(){
     else if(q.group==='Perframinimas') refr += score;
     else refl += score;
   });
-  return {sys, refr, refl, allAnswered};
+  return {sys, refr, refl, allAnswered, total: sys+refr+refl};
 }
 
-/* Rezultatų atvaizdavimas */
+/* Rezultatų atvaizdavimas su interpretacijomis */
 function showResults(){
-  const {sys, refr, refl, allAnswered} = compute();
+  const {sys, refr, refl, total, allAnswered} = compute();
   if(!allAnswered){
     alert('Užpildykite visus klausimus prieš pateikdami atsakymus.');
     return;
   }
-  document.getElementById('sysScore').textContent = `${sys}/25`;
+
+  // Skaičiai
+  document.getElementById('sysScore').textContent  = `${sys}/25`;
   document.getElementById('refrScore').textContent = `${refr}/25`;
   document.getElementById('reflScore').textContent = `${refl}/25`;
+  document.getElementById('totalScore').textContent= `${total}/75`;
+
+  // Interpretacijos
+  const sysLabel  = labelForScore(sys);
+  const refrLabel = labelForScore(refr);
+  const reflLabel = labelForScore(refl);
+  const totalLabel= labelForScore(Math.round(total/3)); // bendras lygis pagal vidurkį
+
+  document.getElementById('sysInterp').textContent  = `${sysLabel}. ${adviceForDomain('Sisteminis mąstymas', sys)}`;
+  document.getElementById('refrInterp').textContent = `${refrLabel}. ${adviceForDomain('Perframinimas', refr)}`;
+  document.getElementById('reflInterp').textContent = `${reflLabel}. ${adviceForDomain('Refleksija', refl)}`;
+
+  // Bendras komentaras
+  const totalInterp = {
+    Pažengęs: 'Bendras lygis aukštas — gali vesti strategines sesijas ir diegti organizacinius principus.',
+    Tvirtas: 'Tvirta strateginė bazė — sutelk dėmesį į nuoseklumą ir prielaidų auditą kiekviename cikle.',
+    Augantis: 'Augimo stadija — standartizuok refleksiją ir perframingą, kad išvengtum tunelinio mąstymo.',
+    Pradinis: 'Pradinė stadija — pradėk nuo mažų ritualų: 2 scenarijai, AAR po kiekvieno projekto, „advokato velnio“ rolė.'
+  }[totalLabel];
+
+  document.getElementById('totalInterp').textContent = `${totalLabel}. ${totalInterp}`;
 }
 
 /* Išsaugojimas naršyklėje */
@@ -304,9 +365,14 @@ function load(){
 function clearAll(){
   form.reset();
   updateProgress();
-  document.getElementById('sysScore').textContent = '0/25';
+  document.getElementById('sysScore').textContent  = '0/25';
   document.getElementById('refrScore').textContent = '0/25';
   document.getElementById('reflScore').textContent = '0/25';
+  document.getElementById('totalScore').textContent= '0/75';
+  document.getElementById('sysInterp').textContent  = '';
+  document.getElementById('refrInterp').textContent = '';
+  document.getElementById('reflInterp').textContent = '';
+  document.getElementById('totalInterp').textContent= '';
 }
 
 /* Mygtukų logika */
@@ -318,5 +384,3 @@ document.getElementById('clearBtn').addEventListener('click', clearAll);
 /* Pradinė būsena */
 updateProgress();
 </script>
-</body>
-</html>
