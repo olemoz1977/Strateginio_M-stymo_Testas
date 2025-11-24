@@ -7,7 +7,7 @@ Interaktyvus testas paremtas STQ metodologija, skirtas įvertinti strateginio m�
 
 Testas pritaikytas mobiliesiems įrenginiams, turi tamsią ir šviesia temą.
 
-pradek testa https://olemoz1977.github.io/Strateginio_M-stymo_Testas/Public
+[🚀 Pradėti testą] (https://olemoz1977.github.io/Strateginio_M-stymo_Testas/Public)
 
 ---
 
