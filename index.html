@@ -468,4 +468,294 @@ document.getElementById('clearBtn').addEventListener('click', clearAll);
 /* Pradinis atnaujinimas */
 updateupdateProgress();
 </script>
+  
+<script>
+/* Tavo originalūs klausimai ir balai – žodis į žodį iš STQ kalusymai.docx */
+const data = [
+  // I. Sisteminis mąstymas
+  { group:'Sisteminis mąstymas', text:'1. Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...', opts:[
+    '...naudoju formalią matrica, kad įvertinčiau tiesioginį poveikį visiems susijusiems skyriams ir skyrių motyvacijai.',
+    '...visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą, ignoruodamas galimus padarinius kitur.',
+    '...analizuoju biudžeto sumažinimo poveikį visos organizacijos vertės grandinei, kad užtikrinčiau, jog pokytis nepažeis bendro įmonės konkurencinio pranašumo.',
+    '...paklausiu kelių kitų skyrių vadovų nuomonės apie galimus neigiamus padarinius jų darbui.',
+    '...atsižvelgiu į gretimų skyrių prieštaravimus, bet vis tiek darau tai, kas geriausia mano skyriui.'
+  ], scores:[4,1,5,3,2] },
+
+  { group:'Sisteminis mąstymas', text:'2. Susidūrus su klientų praradimu, aš...', opts:[
+    '...analizuoju ne tik vidinius procesus, bet ir išorinius rinkos pokyčius bei konkurentų veiksmus, siekdamas atpažinti ilgalaikes tendencijas, kurios galėjo pakeisti klientų poreikius.',
+    '...peržiūriu paskutinių savaičių pardavimų ataskaitas, kad pamatyčiau, kurioje srityje praradome daugiausiai.',
+    '...iš karto kaltinu pardavimų skyrių ir reikalauju nedelsiant padidinti pardavimus per šį mėnesį.',
+    '...stengiuosi atsekti, kokios vidinės klaidos (pvz., IT sistemos lėtumas ar biurokratiniai procesai) lėmė klientų patirties pablogėjimą.',
+    '...peržiūriu tiek pardavimų, tiek produktų kokybės duomenis, ieškodamas akivaizdžių nesutapimų.'
+  ], scores:[5,2,1,4,3] },
+
+  { group:'Sisteminis mąstymas', text:'3. Mano požiūris į ilgalaikes makroekonomines ir technologines tendencijas (pvz., AI, reguliavimas) yra...', opts:[
+    '...aš perskaitau pagrindines naujienas, bet tai neturi įtakos mano savaitiniams sprendimams.',
+    '...aš reguliariai inicijuoju scenarijų planavimo susitikimus, kad įvertinčiau, kaip šios tendencijos gali priversti mūsų įmonę fundamentaliai pakeisti verslo modelį per ateinančius 5 metus.',
+    '...kad tai yra aukščiausios vadovybės reikalas, o aš turiu susitelkti į šiandienos rezultatus.',
+    '...aš kartais diskutuoju apie tai su komanda, bandydamas rasti idėjų, bet neturiu nuolatinio proceso.',
+    '...aš nuolat stebiu šias tendencijas ir peržiūriu savo skyriaus prioritetus kas ketvirtį.'
+  ], scores:[2,5,1,3,4] },
+
+  { group:'Sisteminis mąstymas', text:'4. Kai iškyla problemos, kurios viršija mano skyriaus kompetenciją, aš...', opts:[
+    '...bandau išspręsti problemą tik savo skyriaus resursais, kad parodyčiau efektyvumą.',
+    '...sistemiškai ieškau pasikartojančios organizacinės priežasties (pvz., neaiškių atsakomybių, silpnų IT sąsajų), dėl kurios ši problema nuolat atsiranda keliuose skyriuose.',
+    '...visą atsakomybę perduodu aukštesnei vadovybei arba kitam skyriui, ir nustoju stebėti eigą.',
+    '...bendradarbiauju su vienu ar dviem susijusiais skyriais, kad rasčiau kompromisą.',
+    '...inicijuoju tarpfunkcinį (angl. cross-functional) susitikimą, kad išanalizuočiau, kaip problemai spręsti reikia bendros kelių skyrių sistemos.'
+  ], scores:[2,5,1,3,4] },
+
+  { group:'Sisteminis mąstymas', text:'5. Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...', opts:[
+    '...kritinių prielaidų nustatymui apie ateitį (pvz., ar rinka augs, ar technologijos keisis) ir planų kūrimui, kaip veiksime, jei tos prielaidos pasirodys klaidingos.',
+    '...išteklių paskirstymui pagal dabartinius projektų prioritetus.',
+    '...tikslų nustatymui, pagrįstam praėjusių metų rezultatais.',
+    '...įvairioms rizikoms ir galimybėms, įtraukiant tiek vidinius, tiek išorinius veiksnius.',
+    '...išsamiai analizei, kaip pasiekti konkurencinį pranašumą artimiausiu metu (iki 1 metų).'
+  ], scores:[5,2,1,4,3] },
+
+  // II. Perframinimas
+  { group:'Perframinimas', text:'6. Komandai nepavykstant įveikti sudėtingos kliūties (pvz., nepasiekiami pardavimų tikslai), aš...', opts:[
+    '...liepiu komandai pilnai sustabdyti veiklą ir sugalvoti 5 skirtingus būdus, kaip būtų galima iš naujo apibrėžti problemą (pvz., ne "pardavimų trūkumas", o "vertės pasiūlymo neatitikimas").',
+    '...organizuoja dirbtuves, kurios skirtos problemai spręsti iš kito vaidmens perspektyvos (pvz., "Ką darytų mūsų konkurentas/klientas šioje situacijoje?"), kad sugeneruotume visiškai naują požiūrį.',
+    '...paprašau jų pateikti 3–4 naujus, bet panašius veiksmų planus.',
+    '...primenu jiems, kad reikia stengtis labiau ir naudoti jau patvirtintas taktikas.',
+    '...inicijuoja diskusiją, kurios metu siūlomos ir radikaliai kitokios idėjos.'
+  ], scores:[4,5,2,1,3] },
+
+  { group:'Perframinimas', text:'7. Ruošiantis svarbiam sprendimui, aš visada...', opts:[
+    '...inicijuoja procesą, kurio metu sąmoningai kuriami keli nesuderinami scenarijai (pvz., geriausias atvejis, blogiausias atvejis, neįtikėtinas atvejis), kad išvengčiau "tunelinio mąstymo" ir parengčiau save staigiems pokyčiams.',
+    '...ieškau objektyvių duomenų, kurie padėtų man apsispręsti tarp dviejų akivaizdžių pasirinkimų.',
+    '...prašau komandos surinkti duomenis, kurie patvirtintų ir paneigtų mano pradinę idėją.',
+    '...ieškau įrodymų, kurie patvirtintų mano pradinę idėją ir požiūrį.',
+    '...ieškau aktyvių oponentų (žmonių su priešinga nuomone) ir prašau jų paruošti atsakomąjį pasiūlymą, kad iššūkčiau savo prielaidoms.'
+  ], scores:[5,2,3,1,4] },
+
+  { group:'Perframinimas', text:'8. Susidūrus su sudėtingu tikslu, aš...', opts:[
+    '...naudoju tik tuos metodus ir įrankius, kuriuos jau esu išbandęs anksčiau ir žinau, kad veikia.',
+    '...naudoju populiariausius pramonės standartus (pvz., SWOT) analizei atlikti.',
+    '...ieškau visiškai nekonvencinių ir kūrybinių sprendimų, kurie gali atrodyti rizikingi, bet gali duoti didžiulę grąžą.',
+    '...aš manau, kad paties tikslo apibrėžimas gali būti klaidingas, todėl prieš dirbdamas bandau išsiaiškinti, koks yra tikrasis verslo poreikis už to tikslo, ir galbūt pakeisti kryptį.',
+    '...svarstau apie metodų adaptavimą iš kitų pramonės šakų (pvz., logistikos metodai IT projektui).'
+  ], scores:[1,2,4,5,3] },
+
+  { group:'Perframinimas', text:'9. Iškilo netikėta nauja problema. Aš...', opts:[
+    '...bandau pritaikyti standartines organizacijos procedūras naujai problemai.',
+    '...gaištu laiką ieškodamas analogiškų problemų sprendimų savo patirtyje.',
+    '...sistemiškai ieškau sprendimų, kurie buvo sėkmingai taikomi visiškai skirtingose pramonės šakose ar situacijose, kad atversčiau požiūrį.',
+    '...greitai pasitelkiu išorinius ekspertus, kad gaučiau patikrintą sprendimą.',
+    '...sistemiškai dekonstruoju problemą, nustatydamas visas prielaidas, ir tada bandau jas išardyti arba apversti aukštyn kojomis (pvz., "O kas, jei mes niekada neišspręsime šios problemos, bet tiesiog apeisime ją?").'
+  ], scores:[2,1,4,3,5] },
+
+  { group:'Perframinimas', text:'10. Kai komanda generuoja idėjas, mano vaidmuo yra...', opts:[
+    '...iš karto atmesti bet kokias idėjas, kurios atrodo per daug rizikingos.',
+    '...užtikrinti, kad idėjos būtų realistiškos ir atitiktų dabartinį biudžetą.',
+    '...paskirti vieną asmenį atstovauti „advokato velnio“ pozicijai, kuris visada privalo abejoti prielaidomis, metodais ir tikslais, taip užtikrinant nuolatinį idėjos peržiūrėjimą.',
+    '...leisti generuoti laisvai, bet galiausiai pasirinkti geriausią iš akivaizdžių variantų.',
+    '...aktyviai paskatinti komandą generuoti idėjas, kurios prieštarautų dabartinei strategijai ir atrodytų neįgyvendinamos per artimiausius metus.'
+  ], scores:[2,1,5,3,4] },
+
+  // III. Refleksija
+  { group:'Refleksija', text:'11. Po didelės sėkmės/nesėkmės, aš...', opts:[
+    '...naudoju rezultatus kaip medžiagą asmeniniam strateginiam dienoraščiui, kad suformuluočiau naujas taisykles ar metodologijas (principus), kurios galėtų būti taikomos bet kurioje ateities situacijoje.',
+    '...surengiu trumpą susitikimą rezultatams aptarti ir padėkoti komandai.',
+    '...greitai einu prie kito darbo, nes praeitis neturi įtakos ateičiai.',
+    '...organizuoju struktūrizuotą peržiūrą, kurioje dokumentuojami ne tik rezultatai, bet ir sąlygos/prielaidos, kuriomis priėmėme sprendimus.',
+    '...parašau trumpą atmintinę apie pagrindines išmoktas pamokas, skirtą tik komandos nariams.'
+  ], scores:[5,2,1,4,3] },
+
+  { group:'Refleksija', text:'12. Aš aktyviai ieškau kritinio grįžtamojo ryšio apie savo sprendimų priėmimo procesą...', opts:[
+    '...iš nepriklausomų patarėjų ar vadovų iš kitų pramonės šakų, kad iššūkčiau savo įsitikinimams ir aptikčiau "akląsias zonas" (angl. blind spots).',
+    '...tik iš tų asmenų, kuriais pasitikiu ir kurie neabejotinai palaiko mano sprendimus.',
+    '...iš platesnio suinteresuotųjų šalių rato, įskaitant tuos, kurie buvo nepatogūs ar su manimi nesutiko.',
+    '...tik tada, kai man jo prašo.',
+    '...iš savo tiesioginių pavaldinių ir vadovų.'
+  ], scores:[5,2,4,1,3] },
+
+  { group:'Refleksija', text:'13. Kai analizuoju praeities klaidas, aš visų pirma ieškau...', opts:[
+    '...pamokų, kurios padėtų išvengti tų pačių klaidų ateityje.',
+    '...klaidų padariusių asmenų, kad galėčiau užtikrinti atsakomybę.',
+    '...prielaidų, kuriomis buvo remiamasi priimant sprendimus, kad išmokčiau atpažinti klaidingas prielaidas anksčiau.',
+    '...kaip šios klaidos atspindi platesnes organizacines tendencijas ar kultūrines spragas, ir bandau sukurti ilgalaikę mokymosi sistemą organizacijoje.',
+    '...akivaizdžių sistemų trūkumų, kad juos greitai pataisyčiau.'
+  ], scores:[3,1,4,5,2] },
+
+  { group:'Refleksija', text:'14. Mano nuomonė apie strategijos keitimą (perplanavimą) yra...', opts:[
+    '...kad strategija turi būti nuolat peržiūrima, bet pakeitimai turėtų būti daromi tik po išsamios analizės.',
+    '...kad tai rodo silpnumą ir neapgalvotą pradinį planą, todėl stengiuosi laikytis pirminio plano.',
+    '...kad planą galima keisti, bet tik metų pabaigoje, kad išvengtume chaoso.',
+    '...kad keisti reikia tik tada, kai pasiekiami blogi rezultatai.',
+    '...kad strateginis planavimas yra nuolatinė mokymosi funkcija, todėl, gavus naujų duomenų ar atradus naują perspektyvą, pakeitimas turi būti inicijuojamas nedelsiant, net jei tai sukelia trumpalaikį nepatogumą.'
+  ], scores:[4,1,3,2,5] },
+
+  { group:'Refleksija', text:'15. Priėmęs svarbų sprendimą, kuris pasirodė sėkmingas, aš...', opts:[
+    '...dokumentuoju sėkmės istoriją ir nustatau, kokios vidinės/išorinės sąlygos turi būti pakartotos kituose projektuose.',
+    '...tiesiog džiaugiuosi sėkme ir imuosi kito projekto.',
+    '...išvedu bendrą principą (metareglamentą) iš tos sėkmės ir bandau jį pritaikyti visiškai skirtingose situacijose (ne tik panašiuose projektuose), kad patikrinčiau jo universalumą.',
+    '...analizuoju, kurie veiksmai atvedė prie sėkmės.',
+    '...greitai pasidalinu pamoka apie sėkmę su kolegomis.'
+  ], scores:[4,1,5,3,2] }
+];
+
+/* --- Generavimas --- */
+const container = document.getElementById('questions');
+const form = document.getElementById('stqForm');
+
+function render(){
+  container.innerHTML = '';
+  data.forEach((q, i)=>{
+    if(!q.opts || !q.scores || q.opts.length!==q.scores.length){
+      throw new Error(`Q${i+1}: 'opts' ir 'scores' skaičius turi sutapti.`);
+    }
+    const wrap = document.createElement('div'); wrap.className = 'q';
+    const groupTitle = document.createElement('div'); groupTitle.className = 'group-title'; groupTitle.textContent = q.group; wrap.appendChild(groupTitle);
+    const h3 = document.createElement('h3'); h3.textContent = q.text; wrap.appendChild(h3);
+    const choices = document.createElement('div'); choices.className = 'choices';
+
+    q.opts.forEach((opt, j)=>{
+      const id = `q${i}_o${j}`;
+      const label = document.createElement('label');
+      const input = document.createElement('input'); input.type='radio'; input.name=`q${i}`; input.value=j; input.id=id; input.addEventListener('change', updateProgress);
+      const span = document.createElement('span'); span.textContent = opt;
+      label.htmlFor = id; label.appendChild(input); label.appendChild(span);
+      choices.appendChild(label);
+    });
+
+    wrap.appendChild(choices);
+    container.appendChild(wrap);
+  });
+}
+render();
+
+/* --- Progresas --- */
+function answeredCount(){
+  let cnt=0; data.forEach((_,i)=>{ if(form.querySelector(`input[name=q${i}]:checked`)) cnt++; });
+  return cnt;
+}
+function updateProgress(){
+  const cnt = answeredCount();
+  document.getElementById('answeredInfo').textContent = `Atsakyta: ${cnt}/15`;
+  document.getElementById('bar').style.width = `${(cnt/15)*100}%`;
+}
+
+/* --- Interpretacijos --- */
+function labelForScore(score){
+  if (score >= 20) return 'Pažengęs';
+  if (score >= 15) return 'Tvirtas';
+  if (score >= 10) return 'Augantis';
+  return 'Pradinis';
+}
+function adviceForDomain(domain, score){
+  const level = labelForScore(score);
+  const map = {
+    'Sisteminis mąstymas': {
+      'Pažengęs':'Palaikyk prielaidų auditą kas ketvirtį ir scenarijų planavimą (≥3 scenarijai).',
+      'Tvirtas':'Įvesk reguliarų vertės grandinės peržiūrų ritmą ir tarp-funkcines sesijas.',
+      'Augantis':'Sukurk prielaidų žemėlapį (rinka/tech/reglamentas) ir tikrink jį kas mėnesį.',
+      'Pradinis':'Sukurk „sistemos schemą“: procesai→sąsajos→rizikos→sprendimų taisyklės; A3 analizė/savaitę.'
+    },
+    'Perframinimas': {
+      'Pažengęs':'Naudok „advokato velnio“ rolę, apribojimų perkainojimą ir analogijas iš kitų industrijų.',
+      'Tvirtas':'Kiekvienai problemai suformuluok 3 alternatyvius apibrėžimus + 1 „neįtikėtiną“ scenarijų.',
+      'Augantis':'Vesk dirbtuves „ką darytų klientas/konkurentas?“ ir rink analogijas sistemingai.',
+      'Pradinis':'Bent 2 scenarijai + oponentų argumentas prieš sprendimą (venk tunelinio mąstymo).'
+    },
+    'Refleksija': {
+      'Pažengęs':'Fiksuok principus/metareglementus ir testuok kituose projektuose (transferabilumas).',
+      'Tvirtas':'Įdiek AAR su prielaidų dokumentavimu ir eksperimentu kitam etapui.',
+      'Augantis':'Po kiekvieno ciklo rašyk pamokas ir suplanuok 1 eksperimentą.',
+      'Pradinis':'Po kiekvieno projekto 20 min refleksija: kas pavyko/ne, kurios prielaidos klaidingos.'
+    }
+  };
+  return map[domain][level];
+}
+
+/* --- Skaičiavimas --- */
+function compute(){
+  let sys=0, refr=0, refl=0;
+  let allAnswered=true;
+  data.forEach((q,i)=>{
+    const chosen = form.querySelector(`input[name=q${i}]:checked`);
+    if(!chosen){ allAnswered=false; return; }
+    const val = Number(chosen.value);
+    const score = q.scores[val];
+    if(q.group==='Sisteminis mąstymas') sys += score;
+    else if(q.group==='Perframinimas')  refr += score;
+    else                                 refl += score;
+  });
+  return {sys, refr, refl, total: sys+refr+refl, allAnswered};
+}
+
+/* --- Rezultatai --- */
+function showResults(){
+  const {sys, refr, refl, total, allAnswered} = compute();
+  if(!allAnswered){
+    alert('Užpildykite visus 15 klausimų prieš pateikdami atsakymus.');
+    return;
+  }
+  document.getElementById('sysScore').textContent  = `${sys}/25`;
+  document.getElementById('refrScore').textContent = `${refr}/25`;
+  document.getElementById('reflScore').textContent = `${refl}/25`;
+  document.getElementById('totalScore').textContent= `${total}/75`;
+
+  const sysLabel  = labelForScore(sys);
+  const refrLabel = labelForScore(refr);
+  const reflLabel = labelForScore(refl);
+  const totalLabel= labelForScore(Math.round(total/3));
+
+  document.getElementById('sysInterp').textContent  = `${sysLabel}. ${adviceForDomain('Sisteminis mąstymas', sys)}`;
+  document.getElementById('refrInterp').textContent = `${refrLabel}. ${adviceForDomain('Perframinimas', refr)}`;
+  document.getElementById('reflInterp').textContent = `${reflLabel}. ${adviceForDomain('Refleksija', refl)}`;
+
+  const totalMap = {
+    'Pažengęs': 'Aukštas bendras lygis — gali vesti strategines sesijas ir institucionalizuoti principus.',
+    'Tvirtas'  : 'Tvirta bazė — stiprink nuoseklumą: prielaidų auditą ir perframingą kiekviename cikle.',
+    'Augantis' : 'Augimo stadija — standartizuok AAR ir scenarijų planavimą, kad progresas būtų pastovus.',
+    'Pradinis' : 'Pradinis lygis — įvesk mažus ritualus: 2 scenarijai, AAR po projekto, „advokato velnio“ rolė.'
+  };
+  document.getElementById('totalInterp').textContent = `${totalLabel}. ${totalMap[totalLabel]}`;
+}
+
+/* --- Išsaugojimas --- */
+function save(){
+  const answers = data.map((_,i)=>{
+    const chosen = form.querySelector(`input[name=q${i}]:checked`);
+    return chosen? Number(chosen.value) : null;
+  });
+  localStorage.setItem('stq_answers', JSON.stringify(answers));
+  alert('Atsakymai išsaugoti naršyklėje.');
+}
+function load(){
+  const raw = localStorage.getItem('stq_answers');
+  if(!raw){ alert('Nerasta išsaugotų atsakymų.'); return; }
+  const answers = JSON.parse(raw);
+  answers.forEach((val,i)=>{
+    if(val===null) return;
+    const el = form.querySelector(`input[name=q${i}][value="${val}"]`);
+    if(el){ el.checked = true; }
+  });
+  updateProgress();
+  alert('Atsakymai atkurti iš naršyklės.');
+}
+function clearAll(){
+  form.reset();
+  updateProgress();
+  document.getElementById('sysScore').textContent  = '0/25';
+  document.getElementById('refrScore').textContent = '0/25';
+  document.getElementById('reflScore').textContent = '0/25';
+  document.getElementById('totalScore').textContent= '0/75';
+  document.getElementById('sysInterp').textContent  = '';
+  document.getElementById('refrInterp').textContent = '';
+  document.getElementById('reflInterp').textContent = '';
+  document.getElementById('totalInterp').textContent= '';
+}
+
+/* --- Renginiai --- */
+document.getElementById('submitBtn').addEventListener('click', showResults);
+document.getElementById('saveBtn').addEventListener('click', save);
+document.getElementById('loadBtn').addEventListener('click', load);
+document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+/* Pradinė būsena */
+updateProgress();
+
 </body>
