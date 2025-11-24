@@ -46,6 +46,20 @@
     .copyright{margin-top:8px;color:var(--muted)}
     .error{color:var(--warn);font-weight:700;margin-top:8px}
     .hidden{display:none}
+    
+.insight-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:900px){ .insight-grid{grid-template-columns:1fr 1fr} }
+.insight-card{
+  background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px;
+}
+.insight-card h4{margin:0 0 6px}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700; margin-left:8px}
+.badge.low{background:#2d1f1f; color:#fda4a4; border:1px solid #7f1d1d}
+.badge.mid{background:#1f2d25; color:#a7f3d0; border:1px solid #14532d}
+.badge.high{background:#1f2633; color:#93c5fd; border:1px solid #1d4ed8}
+.insight-list{margin:8px 0 0; padding-left:18px}
+.insight-list li{margin:4px 0}
+
     @media print{
       body{background:#fff;color:#000}
       header{position:static;border:none;background:#fff;color:#000}
@@ -95,6 +109,16 @@
       <div>Bendras rezultatas</div>
       <div class="num" id="scoreTotal">0/75</div>
     </div>
+    
+<!-- ŽODINIS VERTINIMAS + PRAKTINĖS REKOMENDACIJOS -->
+<section id="insights" style="margin-top:22px;">
+  <h3>Žodinis vertinimas</h3>
+  <div id="verbalSummary" class="insight-grid"></div>
+
+  <h3 style="margin-top:18px;">Praktinės rekomendacijos (30 dienų)</h3>
+  <div id="actionPlan" class="insight-grid"></div>
+</section>
+
   </div>
 
   <p class="footnote">
@@ -332,17 +356,149 @@
       STQ[2].questions.forEach(q => { const v = answers[q.id]; if (v!==null) refl  += weight(v, !!q.invert) });
       return {sys, refra, refl, total: sys+refra+refl};
     }
-    function showScores(){
-      try{
-        const s = computeScores();
-        document.getElementById('scoreSystemic').textContent   = `${s.sys}/25`;
-        document.getElementById('scoreReframing').textContent  = `${s.refra}/25`;
-        document.getElementById('scoreReflection').textContent = `${s.refl}/25`;
-        document.getElementById('scoreTotal').textContent      = `${s.total}/75`;
-      }catch(e){
-        showError('Skaičiavimas nutrūko: ' + e.message);
-      }
-    }
+
+function showScores(){
+  try{
+    const {sys, refra, refl, total} = computeScores();
+    document.getElementById('scoreSystemic').textContent   = `${sys}/25`;
+    document.getElementById('scoreReframing').textContent  = `${refra}/25`;
+    document.getElementById('scoreReflection').textContent = `${refl}/25`;
+    document.getElementById('scoreTotal').textContent      = `${total}/75`;
+
+    // Nauja eilutė: generuojame žodinį vertinimą ir planą
+    renderInsights({sys, refra, refl, total});
+  }catch(e){
+    showError('Skaičiavimas nutrūko: ' + e.message);
+  }
+}
+
+
+/* ======= INTERPRETACIJOS ======= */
+// Grąžina žodinį vertinimą ir ženkliuką pagal balą
+function describeScale(label, score){
+  let level, text;
+  if(score <= 10){ // Žemas
+    level = 'low';
+    text = `${label}: žemas lygis. Rekomenduojama sistemingai stiprinti pagrindinius įpročius ir procesus prieš imantis sudėtingų iniciatyvų.`;
+  }else if(score <= 18){ // Vidutinis
+    level = 'mid';
+    text = `${label}: vidutinis lygis. Pagrindai veikia, bet yra „aklųjų zonų“ ir nenuoseklumo sprendimų priėmime.`;
+  }else{ // Aukštas
+    level = 'high';
+    text = `${label}: aukštas lygis. Stiprybę verta institucionalizuoti – dalintis praktika, kurti standartus ir mentoruoti kitus.`;
+  }
+  return { level, text };
+}
+
+// Grąžina 3–6 labai konkrečius veiksmus per 30 dienų
+function buildActions(scores){
+  // scores: {sys, refra, refl, total}
+  const actions = [];
+
+  // Sisteminis mąstymas
+  if(scores.sys <= 10){
+    actions.push({title:'Sisteminis mąstymas (0–10)', items:[
+      'Sukurk 1 puslapio „Vertės grandinės žemėlapį“: nuo kliento poreikio iki gamybos ir logistikos (A3 formato).',
+      'Pradėk kassavaitinį „assumption check“: 3 kritinės prielaidos projektui + ką darysi, jei jos klaidingos.',
+      'Suderink 2 kryžminių skyrių susitikimus (pvz., Gamyba + Kokybė): 1 bendras problemos savininkas, 1 bendras KPI.'
+    ]});
+  }else if(scores.sys <= 18){
+    actions.push({title:'Sisteminis mąstymas (11–18)', items:[
+      'Įdiek „pareto + priežasties“ šabloną: 80/20 defektų → 3 sisteminės priežastys → atsakingi.',
+      'Kas ketvirtį atnaujink scenarijus (best/worst/unexpected) ir peržiūrėk skyriaus prioriteto lentą.',
+      'Pridėk „risk lane“ prie projektų Kanban: top-5 rizikos, trigeriai, atsakomybės.'
+    ]});
+  }else{
+    actions.push({title:'Sisteminis mąstymas (19–25)', items:[
+      'Sukurk „cross-functional playbook“ (PDF/Confluence): vertės grandinė, rolės, KPI, eskalavimo kelias.',
+      'Mentoruok 2 meistrus: parodyk, kaip naudoti sistemines matricas sprendimų priėmime.',
+      'Inicijuok trimestrinį „systems review“ su vadovybe: kokias prielaidas keisti prieš kitą ketvirtį.'
+    ]});
+  }
+
+  // Perframinimas
+  if(scores.refra <= 10){
+    actions.push({title:'Perframinimas (0–10)', items:[
+      'Įvesk „advokato velnio“ rolę idėjų sesijose (rotacija): asmuo privalo sugriauti prielaidas.',
+      'Pradėk 30 min. „role-flip“ praktiką: „ką darytų konkurentas/klientas?“ prieš sprendimą.',
+      'Kiekvienam sunkesniam tikslui suformuluok alternatyvų problemos apibrėžimą (min. 3).'
+    ]});
+  }else if(scores.refra <= 18){
+    actions.push({title:'Perframinimas (11–18)', items:[
+      'Naudok 3 scenarijus (best/worst/wild) prieš tvirtinant planą; priskirk signalus ir veiksmus.',
+      'Perkelk 1 metodą iš kitos industrijos į savo procesą (pvz., SMED į perstatymus).',
+      'Fiksuok „reframe log“: ką pakeitei problemos formuluotėje ir kokį efektą tai turėjo KPI.'
+    ]});
+  }else{
+    actions.push({title:'Perframinimas (19–25)', items:[
+      'Vesk 1 val. dirbtuves meistrams apie perframinimą su realiais pavyzdžiais iš pamainos.',
+      'Įdiek idėjų generavimo standartą: 30% „anti-strategy“ idėjų per sesiją.',
+      'Publikuok „reframe casebook“: 6 geriausi atvejai per ketvirtį (skaidrės + pamokos).'
+    ]});
+  }
+
+  // Refleksija
+  if(scores.refl <= 10){
+    actions.push({title:'Refleksija (0–10)', items:[
+      'Įvesk AAR (After Action Review) po svarbių įvykių: kas turėjo vykti, kas įvyko, kodėl, ką keisime.',
+      'Kiekvienai nesėkmei dokumentuok 3 prielaidas, kurios lėmė sprendimus (ir ar jos buvo klaidingos).',
+      'Prašyk kritinio grįžtamojo ryšio iš bent 1 išorinio patarėjo (ne tavo grandinėje).'
+    ]});
+  }else if(scores.refl <= 18){
+    actions.push({title:'Refleksija (11–18)', items:[
+      'Vesk savaitinį „learning stand-up“: 10 min. kiekvieno skyriaus pamoka ir „ką darome kitaip“.',
+      'Sukurk „principų“ sąrašą (metareguliavimą) ir patikrink jį kitokiose situacijose.',
+      'Surink grįžtamąjį ryšį iš platesnio rato (įskaitant nesutinkančius) – kas mėnesį.'
+    ]});
+  }else{
+    actions.push({title:'Refleksija (19–25)', items:[
+      'Standardizuok AAR šabloną (Word/Confluence) ir padaryk privalomu N>3 komandų įvykiams.',
+      'Mentoruok 2 vadovus: mokyk refleksijos principų ir prielaidų auditą.',
+      'Kurk „learning KPI“ (pvz., uždarytų pamokų/įgyvendintų korekcijų % per mėn.).'
+    ]});
+  }
+
+  return actions;
+}
+
+// Atvaizduoja žodinį vertinimą ir planą
+function renderInsights(scores){
+  const verbal = document.getElementById('verbalSummary');
+  const plan   = document.getElementById('actionPlan');
+
+  // Verbal summary – 3 kortelės
+  const dSys  = describeScale('Sisteminis mąstymas', scores.sys);
+  const dRefa = describeScale('Perframinimas', scores.refra);
+  const dRefl = describeScale('Refleksija', scores.refl);
+
+  const cards = [
+    {title:'Sisteminis mąstymas', desc:dSys},
+    {title:'Perframinimas', desc:dRefa},
+    {title:'Refleksija', desc:dRefl},
+  ];
+
+  verbal.innerHTML = cards.map(c => `
+    <div class="insight-card">
+      <h4>${c.title}
+        <span class="badge ${c.desc.level}">
+          ${c.desc.level==='low'?'Žemas':c.desc.level==='mid'?'Vidutinis':'Aukštas'}
+        </span>
+      </h4>
+      <p>${c.desc.text}</p>
+    </div>
+  `).join('');
+
+  // Action plan – 3 kortelės su sąrašais
+  const actions = buildActions(scores);
+  plan.innerHTML = actions.map(a => `
+    <div class="insight-card">
+      <h4>${a.title}</h4>
+      <ul class="insight-list">
+        ${a.items.map(i => `<li>${i}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
 
     // 4) Storage (saugus apvyniojimas)
     function saveToStorage(){
