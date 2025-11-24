@@ -5,7 +5,7 @@ Interaktyvus testas paremtas STQ metodologija, skirtas įvertinti strateginio m�
 - **Perframinimas**
 - **Refleksija**
 
-Testas pritaikytas mobiliesiems įrenginiams, turi tamsią temą.
+Testas pritaikytas mobiliesiems įrenginiams, turi tamsią ir šviesia temą.
 
 pradek testa https://olemoz1977.github.io/Strateginio_M-stymo_Testas/Public
 
