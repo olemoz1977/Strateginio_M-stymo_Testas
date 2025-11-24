@@ -15,6 +15,7 @@ Testas pritaikytas mobiliesiems įrenginiams, turi tamsią ir šviesia temą.
 - 15 klausimų, suskirstytų į 3 kompetencijų blokus
 - Rezultatų analizė pagal kiekvieną dimensiją 
 - PDF atsisiuntimas su rezultatais
+- Veikia be serverio, duomenys saugomi tik naršyklėje.
 
 ---
 
