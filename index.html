@@ -8,33 +8,27 @@
   <title>Strateginio mąstymo testas (STQ)</title>
   <style>
     :root{
-      /* Tamsi tema (default) */
       --bg:#0b0f14; --panel:#121821; --text:#e6edf3; --muted:#9aa7b5;
       --brand:#2f81f7; --ok:#3fb950; --warn:#f85149; --border:#1f2a37;
     }
-    /* Šviesi tema per body klasę */
     body.light {
       --bg:#ffffff; --panel:#f6f8fa; --text:#111827; --muted:#6b7280;
       --brand:#0a66c2; --ok:#157347; --warn:#b02a37; --border:#e5e7eb;
     }
-
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
       font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
     header{padding:18px 20px;border-bottom:1px solid var(--border);background:var(--panel);position:sticky;top:0;z-index:10}
     h1{margin:0;font-size:24px}
     h2{margin:6px 0 0;font-size:15px;color:var(--muted)}
     .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-    button{
-      appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--text);
-      padding:8px 12px;border-radius:8px;cursor:pointer;transition:.15s ease; font-weight:600
-    }
+    button{appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--text);
+      padding:8px 12px;border-radius:8px;cursor:pointer;transition:.15s ease; font-weight:600}
     button:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.25)}
     .primary{background:var(--brand);border-color:var(--brand);color:#fff}
     .success{background:var(--ok);border-color:var(--ok);color:#fff}
     .danger{background:var(--warn);border-color:var(--warn);color:#fff}
     .ghost{background:transparent}
     .meta{display:flex;gap:16px;align-items:center;color:var(--muted);font-weight:600;margin-top:8px}
-
     main{max-width:980px;margin:0 auto;padding:20px}
     .grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:18px}
     @media(min-width:900px){ .grid{grid-template-columns:1fr 1fr} }
@@ -48,13 +42,10 @@
     .scorecard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
     .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
     .card .num{font-size:22px;font-weight:800}
-
     .footnote{margin-top:24px;color:var(--muted);font-size:13px}
     .copyright{margin-top:8px;color:var(--muted)}
     .error{color:var(--warn);font-weight:700;margin-top:8px}
     .hidden{display:none}
-
-    /* Spausdinimui: šviesus fonas, aiškūs kontrastai */
     @media print{
       body{background:#fff;color:#000}
       header{position:static;border:none;background:#fff;color:#000}
@@ -115,324 +106,306 @@
 </main>
 
 <script>
-/* ======= SAUGIKLIS: klaidų rodymas vietoje ======= */
-const errorBox = document.getElementById('errorBox');
-function showError(msg){
-  errorBox.textContent = msg;
-  errorBox.classList.remove('hidden');
-}
-function clearError(){
-  errorBox.classList.add('hidden');
-  errorBox.textContent = '';
-}
+(function(){
+  // Viskas šiame bloke yra izoliuota: jokie globalūs vardai „nelenda“ į išorę.
+  document.addEventListener('DOMContentLoaded', init);
 
-/* ======= KONFIGŪRA ======= */
-const STQ = [
-  {
-    blockId: "systemic",
-    title: "I. Sisteminis mąstymas",
-    questions: [
-      { id:"q1", text:"Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...",
-        options:[
-          "visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą",
-          "atsižvelgiu į gretimų skyrių prieštaravimus",
-          "paklausiu kelių kitų skyrių vadovų nuomonės",
-          "naudoju formalią matricą ir vertinu sąsajas tarp funkcijų",
-          "analizuoju poveikį visos organizacijos vertės grandinei"
-      ]},
-      { id:"q2", text:"Susidūrus su klientų praradimu, aš...",
-        options:[
-          "iš karto kaltinu pardavimų skyrių ir reikalauju greitų rezultatų",
-          "peržiūriu paskutinių savaičių pardavimų ataskaitas",
-          "stengiuosi atsekti vidines klaidas (IT, procesai)",
-          "peržiūriu pardavimų ir kokybės duomenis, ieškau nesutapimų",
-          "analizuoju vidinius procesus ir išorines rinkos tendencijas"
-      ]},
-      { id:"q3", text:"Mano požiūris į ilgalaikes makro tendencijas (AI, reguliavimas) yra...",
-        options:[
-          "tai aukščiausios vadovybės reikalas – dirbu su šiandiena",
-          "perskaitau naujienas, bet jos neturi įtakos sprendimams",
-          "kartais diskutuoju su komanda, be nuolatinio proceso",
-          "nuolat stebiu ir peržiūriu skyriaus prioritetus kas ketvirtį",
-          "inicijuoju scenarijų planavimą, vertinu verslo modelio pokyčius"
-      ]},
-      { id:"q4", text:"Kai iškyla problemos, viršijančios mano skyriaus kompetenciją, aš...",
-        options:[
-          "bandau išspręsti tik savo resursais",
-          "perduodu atsakomybę kitam skyriui ir nustoju sekti eigą",
-          "bendradarbiauju su 1–2 skyriais dėl kompromiso",
-          "inicijuoju tarpfunkcinį susitikimą sistemai sukurti",
-          "ieškau organizacinės priežasties, kodėl problema kartojasi"
-      ]},
-      { id:"q5", text:"Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...",
-        options:[
-          "tikslams pagal praėjusių metų rezultatus",
-          "išteklių paskirstymui dabartiniams prioritetams",
-          "į išsamias artimiausio metų konkurencijos analizes",
-          "įvairioms rizikoms ir vid./išorės veiksniams",
-          "kritinių prielaidų nustatymui ir „jei prielaidos klaidingos“ planams"
-      ]}
-    ]
-  },
-  {
-    blockId: "reframing",
-    title: "II. Perframinimas",
-    questions: [
-      { id:"q6", text:"Komandai neįveikiant sudėtingos kliūties, aš...",
-        options:[
-          "primenu naudoti jau patvirtintas taktikas",
-          "paprašau 3–4 naujų, bet panašių planų",
-          "inicijuoju diskusiją dėl radikaliai kitokių idėjų",
-          "organizuoju dirbtuves iš kito vaidmens perspektyvos",
-          "sustabdyčiau veiklą ir perapibrėžčiau problemą 5 būdais"
-      ]},
-      { id:"q7", text:"Ruošiantis svarbiam sprendimui, aš visada...",
-        options:[
-          "ieškau įrodymų, patvirtinančių pradinę idėją",
-          "ieškau duomenų tarp dviejų akivaizdžių pasirinkimų",
-          "prašau komandos rinkti ir patvirtinančius, ir paneigiančius duomenis",
-          "ieškau aktyvių oponentų paruošti atsakomąjį pasiūlymą",
-          "kuriu nesuderinamus scenarijus (geriausias/blogiausias/netikėtinas)"
-      ]},
-      { id:"q8", text:"Susidūrus su sudėtingu tikslu, aš...",
-        options:[
-          "naudoju tik jau išbandytus metodus",
-          "remiuosi populiariais standartais (SWOT)",
-          "adaptuoju metodus iš kitų industrijų",
-          "tikrinu ar tikslas teisingai apibrėžtas ir gal keičiu kryptį",
-          "ieškau nekonvencinių, kūrybinių (rizikingų) sprendimų"
-      ]},
-      { id:"q9", text:"Iškilus netikėtai problemai, aš...",
-        options:[
-          "taikau standartines procedūras naujai situacijai",
-          "ieškau analogų savo patirtyje",
-          "dekonstruoju prielaidas ir bandau jas apversti",
-          "greitai pasitelkiu išorinius ekspertus",
-          "ieškau sprendimų iš visiškai kitų sričių"
-      ]},
-      { id:"q10", text:"Kai komanda generuoja idėjas, mano vaidmuo yra...",
-        options:[
-          "atmesti rizikingas idėjas",
-          "užtikrinti realizmą ir biudžetą",
-          "paskirti „advokato velnio“ vaidmenį",
-          "leisti generuoti laisvai ir rinktis akivaizdų variantą",
-          "skatinti idėjas, prieštaraujančias dabartinei strategijai"
-      ]}
-    ]
-  },
-  {
-    blockId: "reflection",
-    title: "III. Refleksija",
-    questions: [
-      { id:"q11", text:"Po didelės sėkmės/nesėkmės, aš...",
-        options:[
-          "greitai einu prie kito darbo",
-          "surengiu trumpą dėkojimo susitikimą",
-          "parašau atmintinę pamokoms komandai",
-          "organizuoju struktūruotą peržiūrą su prielaidomis",
-          "vedu strateginį dienoraštį ir formuluoju principus"
-      ]},
-      { id:"q12", text:"Aš aktyviai ieškau kritinio grįžtamojo ryšio...",
-        options:[
-          "tik iš palaikančių asmenų",
-          "tik tada, kai prašo",
-          "iš tiesioginių pavaldinių ir vadovų",
-          "iš platesnio suinteresuotųjų rato (įskaitant nesutinkančius)",
-          "iš nepriklausomų patarėjų iš kitų industrijų"
-      ]},
-      { id:"q13", text:"Kai analizuoju praeities klaidas, pirmiausia ieškau...",
-        options:[
-          "kas konkrečiai suklydo – atsakomybei užtikrinti",
-          "akivaizdžių sistemos trūkumų – greitam pataisymui",
-          "pamokų, padedančių išvengti tų pačių klaidų",
-          "prielaidų, kuriomis rėmėmės priimdami sprendimus",
-          "organizacinių tendencijų ar kultūrinių spragų"
-      ]},
-      { id:"q14", text:"Mano nuomonė apie strategijos keitimą (perplanavimą) yra...",
-        options:[
-          "keisti tik pasiekus blogus rezultatus",
-          "planą galima keisti tik metų pabaigoje",
-          "keitimai rodo silpnumą, laikauosi pirminio",
-          "peržiūrėti nuolat, keisti po išsamios analizės",
-          "strateginis planavimas – nuolatinė mokymosi funkcija, keisti nedelsiant gavus naujų duomenų"
-      ]},
-      { id:"q15", text:"Priėmęs sėkmingą sprendimą, aš...",
-        options:[
-          "tiesiog džiaugiuosi ir imuosi kito projekto",
-          "greitai pasidalinu pamoka su kolegomis",
-          "analizuoju veiksmus, atvedusius į sėkmę",
-          "dokumentuoju sąlygas, kurias reikėtų pakartoti",
-          "išvedu metaprincipą ir tikrinu jo universalumą kitose situacijose"
-      ]}
-    ]
-  }
-];
+  function init(){
+    const errorBox = document.getElementById('errorBox');
+    const blocksContainer = document.getElementById('blocksContainer');
+    const progressEl = document.getElementById('progress');
 
-function weight(choiceIndex, invert=false){
-  const base = choiceIndex + 1; // 0..4 -> 1..5
-  return invert ? (6 - base) : base;
-}
+    const STORAGE_KEY = 'STQ_answers_v3'; // <-- apibrėžta prieš bet kokius kvietimus
 
-const blocksContainer = document.getElementById('blocksContainer');
-function render(){
-  blocksContainer.innerHTML = '';
-  STQ.forEach(block => {
-    const sec = document.createElement('section');
-    sec.className = 'block';
-    sec.id = `block-${block.blockId}`;
+    function showError(msg){
+      errorBox.textContent = msg;
+      errorBox.classList.remove('hidden');
+    }
+    function clearError(){
+      errorBox.classList.add('hidden');
+      errorBox.textContent = '';
+    }
 
-    const h3 = document.createElement('h3');
-    h3.textContent = block.title;
-    sec.appendChild(h3);
+    const STQ = [
+      {
+        blockId: "systemic",
+        title: "I. Sisteminis mąstymas",
+        questions: [
+          { id:"q1", text:"Kai sprendžiu skyriaus biudžeto sumažinimo problemą, aš...",
+            options:[
+              "visą dėmesį sutelkiu į savo skyriaus išlaidų mažinimą",
+              "atsižvelgiu į gretimų skyrių prieštaravimus",
+              "paklausiu kelių kitų skyrių vadovų nuomonės",
+              "naudoju formalią matricą ir vertinu sąsajas tarp funkcijų",
+              "analizuoju poveikį visos organizacijos vertės grandinei"
+          ]},
+          { id:"q2", text:"Susidūrus su klientų praradimu, aš...",
+            options:[
+              "iš karto kaltinu pardavimų skyrių ir reikalauju greitų rezultatų",
+              "peržiūriu paskutinių savaičių pardavimų ataskaitas",
+              "stengiuosi atsekti vidines klaidas (IT, procesai)",
+              "peržiūriu pardavimų ir kokybės duomenis, ieškau nesutapimų",
+              "analizuoju vidinius procesus ir išorines rinkos tendencijas"
+          ]},
+          { id:"q3", text:"Mano požiūris į ilgalaikes makro tendencijas (AI, reguliavimas) yra...",
+            options:[
+              "tai aukščiausios vadovybės reikalas – dirbu su šiandiena",
+              "perskaitau naujienas, bet jos neturi įtakos sprendimams",
+              "kartais diskutuoju su komanda, be nuolatinio proceso",
+              "nuolat stebiu ir peržiūriu skyriaus prioritetus kas ketvirtį",
+              "inicijuoju scenarijų planavimą, vertinu verslo modelio pokyčius"
+          ]},
+          { id:"q4", text:"Kai iškyla problemos, viršijančios mano skyriaus kompetenciją, aš...",
+            options:[
+              "bandau išspręsti tik savo resursais",
+              "perduodu atsakomybę kitam skyriui ir nustoju sekti eigą",
+              "bendradarbiauju su 1–2 skyriais dėl kompromiso",
+              "inicijuoju tarpfunkcinį susitikimą sistemai sukurti",
+              "ieškau organizacinės priežasties, kodėl problema kartojasi"
+          ]},
+          { id:"q5", text:"Planuojant ilgalaikę strategiją, didžiausią dėmesį skiriu...",
+            options:[
+              "tikslams pagal praėjusių metų rezultatus",
+              "išteklių paskirstymui dabartiniams prioritetams",
+              "į išsamias artimiausio metų konkurencijos analizes",
+              "įvairioms rizikoms ir vid./išorės veiksniams",
+              "kritinių prielaidų nustatymui ir „jei prielaidos klaidingos“ planams"
+          ]}
+        ]
+      },
+      {
+        blockId: "reframing",
+        title: "II. Perframinimas",
+        questions: [
+          { id:"q6", text:"Komandai neįveikiant sudėtingos kliūties, aš...",
+            options:[
+              "primenu naudoti jau patvirtintas taktikas",
+              "paprašau 3–4 naujų, bet panašių planų",
+              "inicijuoju diskusiją dėl radikaliai kitokių idėjų",
+              "organizuoju dirbtuves iš kito vaidmens perspektyvos",
+              "sustabdyčiau veiklą ir perapibrėžčiau problemą 5 būdais"
+          ]},
+          { id:"q7", text:"Ruošiantis svarbiam sprendimui, aš visada...",
+            options:[
+              "ieškau įrodymų, patvirtinančių pradinę idėją",
+              "ieškau duomenų tarp dviejų akivaizdžių pasirinkimų",
+              "prašau komandos rinkti ir patvirtinančius, ir paneigiančius duomenis",
+              "ieškau aktyvių oponentų paruošti atsakomąjį pasiūlymą",
+              "kuriu nesuderinamus scenarijus (geriausias/blogiausias/netikėtinas)"
+          ]},
+          { id:"q8", text:"Susidūrus su sudėtingu tikslu, aš...",
+            options:[
+              "naudoju tik jau išbandytus metodus",
+              "remiuosi populiariais standartais (SWOT)",
+              "adaptuoju metodus iš kitų industrijų",
+              "tikrinu ar tikslas teisingai apibrėžtas ir gal keičiu kryptį",
+              "ieškau nekonvencinių, kūrybinių (rizikingų) sprendimų"
+          ]},
+          { id:"q9", text:"Iškilus netikėtai problemai, aš...",
+            options:[
+              "taikau standartines procedūras naujai situacijai",
+              "ieškau analogų savo patirtyje",
+              "dekonstruoju prielaidas ir bandau jas apversti",
+              "greitai pasitelkiu išorinius ekspertus",
+              "ieškau sprendimų iš visiškai kitų sričių"
+          ]},
+          { id:"q10", text:"Kai komanda generuoja idėjas, mano vaidmuo yra...",
+            options:[
+              "atmesti rizikingas idėjas",
+              "užtikrinti realizmą ir biudžetą",
+              "paskirti „advokato velnio“ vaidmenį",
+              "leisti generuoti laisvai ir rinktis akivaizdų variantą",
+              "skatinti idėjas, prieštaraujančias dabartinei strategijai"
+          ]}
+        ]
+      },
+      {
+        blockId: "reflection",
+        title: "III. Refleksija",
+        questions: [
+          { id:"q11", text:"Po didelės sėkmės/nesėkmės, aš...",
+            options:[
+              "greitai einu prie kito darbo",
+              "surengiu trumpą dėkojimo susitikimą",
+              "parašau atmintinę pamokoms komandai",
+              "organizuoju struktūruotą peržiūrą su prielaidomis",
+              "vedu strateginį dienoraštį ir formuluoju principus"
+          ]},
+          { id:"q12", text:"Aš aktyviai ieškau kritinio grįžtamojo ryšio...",
+            options:[
+              "tik iš palaikančių asmenų",
+              "tik tada, kai prašo",
+              "iš tiesioginių pavaldinių ir vadovų",
+              "iš platesnio suinteresuotųjų rato (įskaitant nesutinkančius)",
+              "iš nepriklausomų patarėjų iš kitų industrijų"
+          ]},
+          { id:"q13", text:"Kai analizuoju praeities klaidas, pirmiausia ieškau...",
+            options:[
+              "kas konkrečiai suklydo – atsakomybei užtikrinti",
+              "akivaizdžių sistemos trūkumų – greitam pataisymui",
+              "pamokų, padedančių išvengti tų pačių klaidų",
+              "prielaidų, kuriomis rėmėmės priimdami sprendimus",
+              "organizacinių tendencijų ar kultūrinių spragų"
+          ]},
+          { id:"q14", text:"Mano nuomonė apie strategijos keitimą (perplanavimą) yra...",
+            options:[
+              "keisti tik pasiekus blogus rezultatus",
+              "planą galima keisti tik metų pabaigoje",
+              "keitimai rodo silpnumą, laikauosi pirminio",
+              "peržiūrėti nuolat, keisti po išsamios analizės",
+              "strateginis planavimas – nuolatinė mokymosi funkcija, keisti nedelsiant gavus naujų duomenų"
+          ]},
+          { id:"q15", text:"Priėmęs sėkmingą sprendimą, aš...",
+            options:[
+              "tiesiog džiaugiuosi ir imuosi kito projekto",
+              "greitai pasidalinu pamoka su kolegomis",
+              "analizuoju veiksmus, atvedusius į sėkmę",
+              "dokumentuoju sąlygas, kurias reikėtų pakartoti",
+              "išvedu metaprincipą ir tikrinu jo universalumą kitose situacijose"
+          ]}
+        ]
+      }
+    ];
 
-    block.questions.forEach((q, qi) => {
-      const qDiv = document.createElement('div');
-      qDiv.className = 'q';
-      const qTitle = document.createElement('div');
-      qTitle.className = 'q-title';
-      qTitle.textContent = `${qi+1}. ${q.text}`;
-      qDiv.appendChild(qTitle);
+    const weight = (idx, invert=false) => invert ? (5-idx) : (idx+1);
 
-      const opts = document.createElement('div');
-      opts.className = 'options';
-      q.options.forEach((opt, oi) => {
-        const id = `${q.id}_${oi}`;
-        const row = document.createElement('label');
-        row.className = 'radio';
-        const radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = q.id;
-        radio.value = oi;
-        radio.id = id;
-        radio.addEventListener('change', () => {
-          updateProgress();
-          showScores();     // skaičiuojame iškart po kiekvieno pasirinkimo
-          clearError();
+    // 1) Render
+    function render(){
+      blocksContainer.innerHTML = '';
+      STQ.forEach(block => {
+        const sec = document.createElement('section');
+        sec.className = 'block'; sec.id = `block-${block.blockId}`;
+        const h3 = document.createElement('h3'); h3.textContent = block.title;
+        sec.appendChild(h3);
+
+        block.questions.forEach((q, qi) => {
+          const qDiv = document.createElement('div'); qDiv.className = 'q';
+          const qTitle = document.createElement('div'); qTitle.className='q-title';
+          qTitle.textContent = `${qi+1}. ${q.text}`;
+          qDiv.appendChild(qTitle);
+
+          const opts = document.createElement('div'); opts.className='options';
+          q.options.forEach((opt, oi) => {
+            const id = `${q.id}_${oi}`;
+            const row = document.createElement('label'); row.className='radio';
+            row.innerHTML = `<input type="radio" id="${id}" name="${q.id}" value="${oi}"><span>${opt}</span>`;
+            opts.appendChild(row);
+          });
+
+          qDiv.appendChild(opts);
+          sec.appendChild(qDiv);
         });
-        const span = document.createElement('span');
-        span.textContent = opt;
-        row.appendChild(radio);
-        row.appendChild(span);
-        opts.appendChild(row);
-      });
 
-      qDiv.appendChild(opts);
-      sec.appendChild(qDiv);
+        blocksContainer.appendChild(sec);
+      });
+    }
+
+    // 2) Event delegavimas (vienas listener’is)
+    blocksContainer.addEventListener('change', (ev) => {
+      const target = ev.target;
+      if(target && target.type === 'radio'){
+        clearError();
+        updateProgress();
+        showScores();
+      }
     });
 
-    blocksContainer.appendChild(sec);
-  });
-
-  restoreFromStorage(false); // jei yra, pažymi ankstesnius atsakymus
-  updateProgress();
-  showScores();
-}
-render();
-
-/* ======= LOGIKA ======= */
-const progressEl = document.getElementById('progress');
-function getAnswers(){
-  const answers = {};
-  STQ.forEach(b => b.questions.forEach(q => {
-    const selected = document.querySelector(`input[name="${q.id}"]:checked`);
-    answers[q.id] = selected ? Number(selected.value) : null;
-  }));
-  return answers;
-}
-function updateProgress(){
-  const a = getAnswers();
-  const answered = Object.values(a).filter(v => v !== null).length;
-  progressEl.textContent = `Atsakyta: ${answered}/15`;
-}
-function computeScores(){
-  const answers = getAnswers();
-  let sys=0, refra=0, refl=0;
-  STQ[0].questions.forEach(q => { const v = answers[q.id]; if (v!==null) sys += weight(v, !!q.invert) });
-  STQ[1].questions.forEach(q => { const v = answers[q.id]; if (v!==null) refra += weight(v, !!q.invert) });
-  STQ[2].questions.forEach(q => { const v = answers[q.id]; if (v!==null) refl += weight(v, !!q.invert) });
-  const total = sys + refra + refl;
-  return {sys, refra, refl, total};
-}
-function showScores(){
-  try{
-    const {sys, refra, refl, total} = computeScores();
-    document.getElementById('scoreSystemic').textContent = `${sys}/25`;
-    document.getElementById('scoreReframing').textContent = `${refra}/25`;
-    document.getElementById('scoreReflection').textContent = `${refl}/25`;
-    document.getElementById('scoreTotal').textContent = `${total}/75`;
-  }catch(e){
-    showError('Skaičiavimas nutrūko: ' + e.message);
-  }
-}
-
-/* ======= Saugojimas / Atkūrimas ======= */
-const STORAGE_KEY = 'STQ_answers_v2';
-function saveToStorage(){
-  try{
-    const answers = getAnswers();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
-    alert('Atsakymai išsaugoti naršyklėje.');
-  }catch(e){
-    showError('Nepavyko išsaugoti: ' + e.message);
-  }
-}
-function restoreFromStorage(showAlert=true){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){ if(showAlert) alert('Naršyklėje nerasta išsaugotų atsakymų.'); return; }
-    const answers = JSON.parse(raw);
-    STQ.forEach(b => b.questions.forEach(q => {
-      const v = answers[q.id];
-      if(v !== null && v !== undefined){
-        const input = document.getElementById(`${q.id}_${v}`);
-        if(input) input.checked = true;
+    // 3) Helpers
+    function getAnswers(){
+      const answers = {};
+      STQ.forEach(b => b.questions.forEach(q => {
+        const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+        answers[q.id] = selected ? Number(selected.value) : null;
+      }));
+      return answers;
+    }
+    function updateProgress(){
+      const a = getAnswers();
+      const answered = Object.values(a).filter(v => v !== null).length;
+      progressEl.textContent = `Atsakyta: ${answered}/15`;
+    }
+    function computeScores(){
+      const answers = getAnswers();
+      let sys=0, refra=0, refl=0;
+      STQ[0].questions.forEach(q => { const v = answers[q.id]; if (v!==null) sys   += weight(v, !!q.invert) });
+      STQ[1].questions.forEach(q => { const v = answers[q.id]; if (v!==null) refra += weight(v, !!q.invert) });
+      STQ[2].questions.forEach(q => { const v = answers[q.id]; if (v!==null) refl  += weight(v, !!q.invert) });
+      return {sys, refra, refl, total: sys+refra+refl};
+    }
+    function showScores(){
+      try{
+        const s = computeScores();
+        document.getElementById('scoreSystemic').textContent   = `${s.sys}/25`;
+        document.getElementById('scoreReframing').textContent  = `${s.refra}/25`;
+        document.getElementById('scoreReflection').textContent = `${s.refl}/25`;
+        document.getElementById('scoreTotal').textContent      = `${s.total}/75`;
+      }catch(e){
+        showError('Skaičiavimas nutrūko: ' + e.message);
       }
-    }));
-    if(showAlert) alert('Atsakymai atkurti iš naršyklės.');
+    }
+
+    // 4) Storage (saugus apvyniojimas)
+    function saveToStorage(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getAnswers()));
+        alert('Atsakymai išsaugoti naršyklėje.');
+      }catch(e){
+        showError('Nepavyko išsaugoti: ' + e.message);
+      }
+    }
+    function restoreFromStorage(showAlert=true){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw){ if(showAlert) alert('Naršyklėje nerasta išsaugotų atsakymų.'); return; }
+        const answers = JSON.parse(raw);
+        STQ.forEach(b => b.questions.forEach(q => {
+          const v = answers[q.id];
+          if(v !== null && v !== undefined){
+            const input = document.getElementById(`${q.id}_${v}`);
+            if(input) input.checked = true;
+          }
+        }));
+        if(showAlert) alert('Atsakymai atkurti iš naršyklės.');
+        updateProgress(); showScores();
+      }catch(e){
+        showError('Atkūrimo klaida: ' + e.message);
+      }
+    }
+    function clearAll(){
+      document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+      updateProgress(); showScores();
+    }
+
+    // 5) Mygtukai
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const answered = Object.values(getAnswers()).filter(v => v !== null).length;
+      if(answered < 15){
+        alert(`Neatsakyta į ${15-answered} klausimą(-us). Užpildykite visus 15.`);
+        return;
+      }
+      showScores();
+      const card = document.getElementById('scoreTotal').parentElement;
+      card.style.outline = '2px solid var(--ok)'; setTimeout(() => card.style.outline='none', 1200);
+    });
+    document.getElementById('saveBtn').addEventListener('click', saveToStorage);
+    document.getElementById('restoreBtn').addEventListener('click', () => restoreFromStorage(true));
+    document.getElementById('printBtn').addEventListener('click', () => requestAnimationFrame(() => window.print()));
+    document.getElementById('clearBtn').addEventListener('click', () => { if(confirm('Išvalyti visus atsakymus?')) clearAll(); });
+    document.getElementById('themeBtn').addEventListener('click', () => document.body.classList.toggle('light'));
+
+    // 6) Tema pagal sistemą
+    try{
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      if(prefersLight){ document.body.classList.add('light'); }
+    }catch{}
+
+    // 7) Paleidimas (svarbu: viskas po deklaracijų)
+    render();
+    restoreFromStorage(false);  // saugu: STORAGE_KEY jau apibrėžtas
     updateProgress();
     showScores();
-  }catch(e){
-    showError('Atkūrimo klaida: ' + e.message);
   }
-}
-function clearAll(){
-  document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
-  updateProgress();
-  showScores();
-}
-
-/* ======= Mygtukai ======= */
-document.getElementById('submitBtn').addEventListener('click', () => {
-  const answered = Object.values(getAnswers()).filter(v => v !== null).length;
-  if(answered < 15){
-    const left = 15 - answered;
-    alert(`Neatsakyta į ${left} klausimą(-us). Užpildykite visus 15.`);
-    return;
-  }
-  showScores();
-  document.getElementById('scoreTotal').parentElement.style.outline = '2px solid var(--ok)';
-  setTimeout(() => document.getElementById('scoreTotal').parentElement.style.outline = 'none', 1200);
-});
-document.getElementById('saveBtn').addEventListener('click', saveToStorage);
-document.getElementById('restoreBtn').addEventListener('click', () => restoreFromStorage(true));
-document.getElementById('printBtn').addEventListener('click', () => {
-  // kai kurios UI bibliotekos/ekst. gali blokuoti tiesioginį print – kviečiame „rame“
-  requestAnimationFrame(() => window.print());
-});
-document.getElementById('clearBtn').addEventListener('click', () => {
-  if(confirm('Išvalyti visus atsakymus?')){ clearAll(); }
-});
-document.getElementById('themeBtn').addEventListener('click', () => {
-  document.body.classList.toggle('light');
-});
-
-/* ======= Tema pagal sistemos nuostatą ======= */
-try{
-  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-  if(prefersLight){ document.body.classList.add('light'); }
-}catch{ /* tyliai */ }
+})();
 </script>
 </body>
-</html>
-
 </html>
