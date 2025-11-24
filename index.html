@@ -312,17 +312,16 @@ function updateProgress(){
 /* ----- Lygio etiketės ir patarimai ----- */
 function labelnction labelForScore(score){
   if (score >= 20) return 'Pažengęs';
- Pažengęs';
   if (score >= 15) return 'Tvirtas';
   if (score >= 10) return 'Augantis';
-  return 'Pradinis';
+   if (score >= 5) return 'Pradinis'
 }
 function advicection adviceForDomain(domain, score){
   const level = labelForScore(score);
   const map = {
     'Sisteminis mąstymas': {
       'Pažengęs':'Išlaikyk prielaidų auditą kas ketvirtį ir scenr scenarijų planavimą (≥3 scenarijai).',
-      '     'Tvirtas':'Įvesk reguliarų vertės grandinės peržiūrų ritmą ir tarp-funkcines sesijas.',
+      'Tvirtas':'Įvesk reguliarų vertės grandinės peržiūrų ritmą ir tarp-funkcines sesijas.',
       'Augantis':'Sukurk prielaidų žemėlapį (rinka/tech/reglamentas) ir tikrink jį kas mėnesį.',
       'Pradinis':'Sukurk „sistemos schemą“: procesai→sąsajos→rizikos→sprendimų taisyklės; A3 analizė/savaitę.'
     },
@@ -330,7 +329,7 @@ function advicection adviceForDomain(domain, score){
       'Pažengęs':'Naudok „advokato velnio“ rolę, apribojimų perkainojimą ir analogijas iš kitų industrijų.',
       'Tvirtas':'Kiekvienai problemai suformuluok 3 alternatyvius apibrėžimus + 1 „neįtikėtiną“ scenarijų.',
       'Augantis':'Vesk dirbtuves „ką darytų klientas/konkurentas?“ ir rink analogijas sistemingai.',
-      '     'Pradinis':'Bent 2 scenarijai + oponentų argumentas prieš sprendimą (venk tunelinio mąstymo).'
+      'Pradinis':'Bent 2 scenarijai + oponentų argumentas prieš sprendimą (venk tunelinio mąstymo).'
     },
     'Refleksija': {
       'Pažengęs':'Fiksuok principus/metareglementus ir testuok kituk kituose projektuose (transferabilumas).',
@@ -384,13 +383,10 @@ te();
   document.getElementById('totalScore').textContent= `${total}/75`;
 
   const sysLabel  = labelForScore(sys);
- core(sys);
   const refrLabel = labelForScore(refr);
   const reflLabel = labelForScore(refl);
- fl);
   const totalLabel= labelForScore(Math.round(total/3));
 
- ));
 
   document.getElementById('sysInterp').textContent  = `${sysLabel}. ${adviceForDomain('Sisteminis mąstymas', sysstymas', sys)}`;
   document.getElementById('refrInterp').textContent = `${refrLabel}. ${ad. ${adviceForDomain('Perframinimas', refr)}`;
@@ -459,8 +455,6 @@ function clearAll(){
   documentcument.getElementById('totalInterp').textContent= '';
 }
 
-/*t= '';
-}
 
 /* ----- Renginiai ----- */
 document.getElementById('submitBtn').addEventListener('click', showResults);
